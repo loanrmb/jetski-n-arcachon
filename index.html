@@ -3,635 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JETSKI'N ARCACHON — Location de Jet Ski sur le Bassin</title>
-  <meta name="description" content="Location de jet ski premium sur le Bassin d'Arcachon. 3 modèles Sea-Doo. Réservation en ligne.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <title>Jetski'n Arcachon — Location de Jet Ski sur le Bassin</title>
+  <meta name="description" content="Location de jet ski Sea-Doo sur le Bassin d'Arcachon. 3 modèles. Réservation en ligne.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ═══════════════════════════ NAV ═══════════════════════════ -->
-  <nav class="nav" id="nav">
-    <a href="#home" class="nav-logo">JETSKI'N ARCACHON</a>
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Jetski'n Arcachon</a>
     <div class="nav-links">
       <a href="#models">Modèles</a>
-      <a href="#tarifs">Tarifs</a>
-      <a href="#zone">Navigation</a>
-      <a href="#contact" class="nav-cta">Réserver</a>
+      <a href="#availability">Disponibilités</a>
+      <a href="#pricing">Tarifs</a>
+      <a href="#models" class="nav-cta">Réserver</a>
     </div>
-    <button class="nav-burger" id="navBurger" aria-label="Menu">
-      <span></span><span></span>
-    </button>
-  </nav>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span></button>
+  </div>
+</nav>
 
-  <!-- Mobile menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="#models" class="mob-link">Modèles</a>
-    <a href="#tarifs" class="mob-link">Tarifs</a>
-    <a href="#zone" class="mob-link">Navigation</a>
-    <a href="#contact" class="mob-link mob-cta">Réserver</a>
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#models">Modèles</a>
+  <a href="#availability">Disponibilités</a>
+  <a href="#pricing">Tarifs</a>
+  <a href="#models" class="btn">Réserver</a>
+</div>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="container center">
+    <p class="eyebrow">Bassin d'Arcachon · Gironde · Mai – Septembre</p>
+    <h1>Location de jet ski<br>sur le Bassin.</h1>
+    <p class="intro-sub">Trois modèles Sea-Doo disponibles à la location. Explorez l'Île aux Oiseaux, la Dune du Pilat et le Cap Ferret depuis l'eau. Réservez en ligne, payez sur place.</p>
+    <a href="#models" class="btn">Choisir un modèle</a>
+  </div>
+</section>
+
+<!-- MODEL PICKER -->
+<section class="models" id="models">
+  <div class="model-header">
+    <span class="model-counter" id="modelCounter">01 / 03</span>
+    <h2 class="model-name" id="modelName">Sea-Doo GTI SE 130</h2>
+    <p class="model-tag" id="modelTag">Découverte · Débutant</p>
   </div>
 
-  <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-  <section class="hero" id="home">
-    <div class="hero-bg">
-      <div class="hero-orb hero-orb-1"></div>
-      <div class="hero-orb hero-orb-2"></div>
-      <div class="hero-waves">
-        <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-          <path d="M0,192 C240,256 480,128 720,192 C960,256 1200,128 1440,192 L1440,320 L0,320Z" fill="rgba(0,100,180,0.08)"/>
-          <path d="M0,224 C360,160 720,288 1080,224 C1260,192 1360,256 1440,240 L1440,320 L0,320Z" fill="rgba(0,80,160,0.06)"/>
+  <div class="model-stage" id="modelStage">
+    <button class="arrow" id="prevBtn" aria-label="Précédent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="model-frame" id="modelFrame">
+      <!--
+        REMPLACER PAR UNE VRAIE PHOTO :
+        <img src="images/gti-side.jpg" alt="Sea-Doo GTI SE 130" class="model-photo">
+        Format recommandé : WebP 1400×700, fond blanc ou transparent
+      -->
+      <div class="model-placeholder" id="modelPlaceholder">
+        <svg class="model-svg" id="modelSvg" viewBox="0 0 560 200" fill="none">
+          <path d="M70 128 C92 96 148 74 220 68 L340 65 C410 63 462 73 496 92 C520 106 530 122 524 132 C518 142 500 146 476 145 L94 145 C72 145 55 138 70 128Z" id="svgBody" fill="#CBD5E1"/>
+          <path d="M220 68 L258 30 C264 23 277 20 290 24 L324 38 L340 65Z" id="svgCabin" fill="#B0BEC5"/>
+          <ellipse cx="148" cy="149" rx="30" ry="13" id="svgW1a" fill="#B0BEC5"/>
+          <ellipse cx="418" cy="149" rx="30" ry="13" id="svgW2a" fill="#B0BEC5"/>
+          <ellipse cx="148" cy="149" rx="20" ry="8" id="svgW1b" fill="#90A4AE"/>
+          <ellipse cx="418" cy="149" rx="20" ry="8" id="svgW2b" fill="#90A4AE"/>
+          <rect x="174" y="64" width="88" height="9" rx="4.5" id="svgLine" fill="#90A4AE" opacity="0.5"/>
         </svg>
+        <span class="model-ph-label" id="modelPhLabel">GTI SE 130</span>
       </div>
     </div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Bassin d'Arcachon · Port de plaisance</p>
-      <h1 class="hero-title">La vitesse,<br>l'horizon,<br>le bassin.</h1>
-      <p class="hero-sub">Location de jet ski premium sur le Bassin d'Arcachon.<br>Trois modèles Sea-Doo. Un seul terrain de jeu.</p>
-      <div class="hero-actions">
-        <a href="#models" class="btn-primary">Choisir mon jet ski</a>
-        <a href="#zone" class="btn-ghost">Zone de navigation →</a>
-      </div>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <span class="hero-stat-val">3</span>
-        <span class="hero-stat-label">Modèles</span>
-      </div>
-      <div class="hero-stat-sep"></div>
-      <div class="hero-stat">
-        <span class="hero-stat-val">110+</span>
-        <span class="hero-stat-label">km/h max</span>
-      </div>
-      <div class="hero-stat-sep"></div>
-      <div class="hero-stat">
-        <span class="hero-stat-val">Mai–Sep</span>
-        <span class="hero-stat-label">Saison</span>
-      </div>
-    </div>
-    <div class="hero-scroll-hint">
-      <div class="scroll-line"></div>
-      <span>Défiler</span>
-    </div>
-  </section>
 
-  <!-- ═══════════════════════════ MODELS ═══════════════════════════ -->
-  <section class="models-section" id="models">
-    <div class="section-head">
-      <p class="eyebrow">Nos modèles</p>
-      <h2 class="section-title">Choisissez votre monture</h2>
-    </div>
+    <button class="arrow" id="nextBtn" aria-label="Suivant">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
 
-    <div class="model-tabs" role="tablist">
-      <button class="model-tab active" data-model="0" role="tab">Sea-Doo GTI SE 130</button>
-      <button class="model-tab" data-model="1" role="tab">Sea-Doo GTX 230</button>
-      <button class="model-tab" data-model="2" role="tab">Sea-Doo RXT-X 300</button>
+  <div class="specs-row">
+    <div class="spec"><span class="spec-val" id="svPower">130</span><span class="spec-unit">ch</span><span class="spec-lbl">Puissance</span></div>
+    <div class="spec-sep"></div>
+    <div class="spec"><span class="spec-val" id="svSpeed">75</span><span class="spec-unit">km/h</span><span class="spec-lbl">Vitesse max</span></div>
+    <div class="spec-sep"></div>
+    <div class="spec"><span class="spec-val" id="svSeats">3</span><span class="spec-unit">pers.</span><span class="spec-lbl">Capacité</span></div>
+    <div class="spec-sep"></div>
+    <div class="spec"><span class="spec-val" id="svCyl">1 630</span><span class="spec-unit">cc</span><span class="spec-lbl">Cylindrée</span></div>
+  </div>
+
+  <div class="model-foot">
+    <div class="dots" id="dotsEl">
+      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+    <button class="btn btn-reserve" id="reserveBtn">
+      Réserver — <span id="priceLabel">110 €</span><span class="btn-per">/h</span>
+    </button>
+  </div>
+</section>
+
+<!-- BOOKING MODAL -->
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" id="modal">
+    <button class="modal-x" id="modalClose" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="progress" id="progress">
+      <span class="ps" id="ps1">Date</span>
+      <span class="pl"></span>
+      <span class="ps" id="ps2">Heure</span>
+      <span class="pl"></span>
+      <span class="ps" id="ps3">Infos</span>
     </div>
 
-    <div class="model-stage">
-      <!-- IMAGE PANEL -->
-      <div class="model-visual" id="modelVisual">
-        <!--
-          ┌──────────────────────────────────────────┐
-          │  Remplacer par la vraie photo produit :  │
-          │  <img src="images/gti-side.jpg" ...>     │
-          │  Format recommandé : 1200×750px WebP     │
-          └──────────────────────────────────────────┘
-        -->
-        <div class="model-photo" id="modelPhoto">
-          <div class="photo-placeholder gti" id="photoPlaceholder">
-            <!-- SVG silhouette jetski -->
-            <svg class="jetski-silhouette" viewBox="0 0 600 200" fill="none">
-              <ellipse cx="300" cy="155" rx="240" ry="18" fill="rgba(255,255,255,0.06)"/>
-              <path d="M80 130 C100 100 160 80 240 75 L340 72 C400 70 450 78 490 95 C520 108 535 125 530 135 C525 145 510 148 490 147 L110 148 C88 148 70 142 80 130Z" fill="rgba(255,255,255,0.12)"/>
-              <path d="M100 130 C115 105 165 88 240 83 L335 80 C390 78 440 86 478 100 C505 112 518 128 513 137 C508 146 495 149 476 148 L120 148 C100 148 85 142 100 130Z" fill="rgba(255,255,255,0.18)"/>
-              <path d="M240 75 L280 40 C285 35 295 32 305 35 L340 48 L340 72Z" fill="rgba(255,255,255,0.15)"/>
-              <rect x="170" y="125" width="60" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
-              <rect x="370" y="125" width="60" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
-            </svg>
-            <div class="photo-model-name" id="photoModelName">GTI SE 130</div>
-          </div>
-          <div class="model-pill" id="modelPill">Idéal débutants</div>
-        </div>
-        <div class="view-angles">
-          <button class="angle-btn active" data-view="side">Profil</button>
-          <button class="angle-btn" data-view="front">Face</button>
-          <button class="angle-btn" data-view="quarter">3/4</button>
-        </div>
+    <!-- Step 1: Date -->
+    <div class="step active" id="step1">
+      <p class="step-model" id="modalModelName">Sea-Doo GTI SE 130</p>
+      <h3>Choisissez une date</h3>
+      <p class="step-hint">Les jours grisés sont déjà réservés.</p>
+      <div class="cal-top">
+        <button class="cal-btn" id="calPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <span class="cal-title" id="calTitle">Juin 2025</span>
+        <button class="cal-btn" id="calNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
-
-      <!-- SPECS PANEL -->
-      <div class="model-info">
-        <div class="model-name-row">
-          <h3 class="model-fullname" id="modelFullname">Sea-Doo GTI SE 130</h3>
-          <span class="model-level-tag" id="modelLevelTag">Débutant</span>
-        </div>
-        <p class="model-desc" id="modelDesc">Le jet ski d'initiation par excellence. Stable, maniable, et suffisamment puissant pour explorer le bassin en famille ou en duo. Parfait pour votre première expérience.</p>
-
-        <div class="specs-grid">
-          <div class="spec-card">
-            <div class="spec-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <span class="spec-num" id="specPower">130</span>
-            <span class="spec-unit">ch</span>
-            <span class="spec-lbl">Puissance</span>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <span class="spec-num" id="specSpeed">75</span>
-            <span class="spec-unit">km/h</span>
-            <span class="spec-lbl">Vitesse max</span>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <span class="spec-num" id="specSeats">3</span>
-            <span class="spec-unit">pers.</span>
-            <span class="spec-lbl">Capacité</span>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            </div>
-            <span class="spec-num" id="specCyl">1 630</span>
-            <span class="spec-unit">cc</span>
-            <span class="spec-lbl">Cylindrée</span>
-          </div>
-        </div>
-
-        <div class="level-track">
-          <div class="level-row">
-            <span class="level-label">Niveau requis</span>
-            <span class="level-text" id="levelText">Débutant</span>
-          </div>
-          <div class="level-bar"><div class="level-fill" id="levelFill" style="width:33%"></div></div>
-        </div>
-
-        <div class="model-price-row">
-          <div class="model-price-block">
-            <span class="mp-label">À partir de</span>
-            <span class="mp-val" id="modelStartPrice">110 €</span>
-            <span class="mp-unit">/heure</span>
-          </div>
-          <a href="#contact" class="btn-primary" id="modelReserveBtn">Réserver ce modèle</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ TARIFS ═══════════════════════════ -->
-  <section class="tarifs-section" id="tarifs">
-    <div class="section-head">
-      <p class="eyebrow">Tarifs</p>
-      <h2 class="section-title">Transparent, sans surprise</h2>
-      <p class="section-sub">Carburant en sus · Caution 2 000 € (CB ou espèces) · Permis côtier obligatoire pour location libre</p>
+      <div class="cal-grid" id="calGrid"></div>
+      <button class="btn btn-full" id="toStep2" disabled>Choisir un horaire →</button>
     </div>
 
-    <div class="tarifs-grid">
-
-      <!-- GTI -->
-      <div class="tarif-card reveal">
-        <div class="tarif-top">
-          <div>
-            <p class="tarif-name">GTI SE 130</p>
-            <p class="tarif-tag">Découverte</p>
-          </div>
-          <div class="tarif-power">130 <span>ch</span></div>
-        </div>
-        <div class="tarif-rows">
-          <div class="tarif-row">
-            <span>1 heure</span>
-            <strong>110 €</strong>
-          </div>
-          <div class="tarif-row">
-            <span>2 heures</span>
-            <strong>195 €</strong>
-          </div>
-          <div class="tarif-row tarif-row--hl">
-            <span>Demi-journée <em>4h</em></span>
-            <strong>360 €</strong>
-          </div>
-        </div>
-        <a href="#contact" class="btn-outline tarif-btn">Réserver</a>
+    <!-- Step 2: Time -->
+    <div class="step" id="step2">
+      <button class="back" id="back1">← Retour</button>
+      <h3>Choisissez un créneau</h3>
+      <p class="step-hint" id="step2Date">—</p>
+      <div class="time-grid">
+        <button class="tslot" data-t="09:00">09h00<em>Matin</em></button>
+        <button class="tslot" data-t="11:00">11h00<em>Matin</em></button>
+        <button class="tslot" data-t="14:00">14h00<em>Après-midi</em></button>
+        <button class="tslot" data-t="16:00">16h00<em>Après-midi</em></button>
       </div>
-
-      <!-- GTX — Featured -->
-      <div class="tarif-card tarif-card--dark reveal">
-        <div class="tarif-badge">Populaire</div>
-        <div class="tarif-top">
-          <div>
-            <p class="tarif-name">GTX 230</p>
-            <p class="tarif-tag">Sport</p>
-          </div>
-          <div class="tarif-power">230 <span>ch</span></div>
-        </div>
-        <div class="tarif-rows">
-          <div class="tarif-row">
-            <span>1 heure</span>
-            <strong>125 €</strong>
-          </div>
-          <div class="tarif-row">
-            <span>2 heures</span>
-            <strong>220 €</strong>
-          </div>
-          <div class="tarif-row tarif-row--hl">
-            <span>Demi-journée <em>4h</em></span>
-            <strong>395 €</strong>
-          </div>
-        </div>
-        <a href="#contact" class="btn-primary tarif-btn">Réserver</a>
-      </div>
-
-      <!-- RXT-X -->
-      <div class="tarif-card reveal">
-        <div class="tarif-top">
-          <div>
-            <p class="tarif-name">RXT-X 300</p>
-            <p class="tarif-tag">Performance</p>
-          </div>
-          <div class="tarif-power">300 <span>ch</span></div>
-        </div>
-        <div class="tarif-rows">
-          <div class="tarif-row">
-            <span>1 heure</span>
-            <strong>140 €</strong>
-          </div>
-          <div class="tarif-row">
-            <span>2 heures</span>
-            <strong>245 €</strong>
-          </div>
-          <div class="tarif-row tarif-row--hl">
-            <span>Demi-journée <em>4h</em></span>
-            <strong>430 €</strong>
-          </div>
-        </div>
-        <a href="#contact" class="btn-outline tarif-btn">Réserver</a>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ EQUIPMENT ═══════════════════════════ -->
-  <section class="equip-section">
-    <div class="section-head">
-      <p class="eyebrow">Inclus dans chaque location</p>
-      <h2 class="section-title">Tout ce qu'il vous faut</h2>
-    </div>
-    <div class="equip-grid">
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <p class="equip-name">Gilet de sauvetage</p>
-        <p class="equip-desc">Homologué CE, toutes tailles</p>
-      </div>
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </div>
-        <p class="equip-name">Shorty néoprène</p>
-        <p class="equip-desc">Toutes tailles disponibles</p>
-      </div>
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 8v4l3 3"/>
-          </svg>
-        </div>
-        <p class="equip-name">Briefing sécurité</p>
-        <p class="equip-desc">Avant chaque sortie</p>
-      </div>
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
-          </svg>
-        </div>
-        <p class="equip-name">Sac étanche</p>
-        <p class="equip-desc">Pour vos effets personnels</p>
-      </div>
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-          </svg>
-        </div>
-        <p class="equip-name">Carte des zones</p>
-        <p class="equip-desc">Zones autorisées & interdites</p>
-      </div>
-      <div class="equip-item reveal">
-        <div class="equip-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-        </div>
-        <p class="equip-name">Assurance RC</p>
-        <p class="equip-desc">Responsabilité civile incluse</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ ZONE MAP ═══════════════════════════ -->
-  <section class="zone-section" id="zone">
-    <div class="section-head">
-      <p class="eyebrow">Zone de navigation</p>
-      <h2 class="section-title">Le Bassin d'Arcachon</h2>
-      <p class="section-sub">Naviguez en connaissance de cause. Zones vertes : navigation rapide autorisée. Zones rouges : aires naturelles protégées.</p>
+      <button class="btn btn-full" id="toStep3" disabled>Continuer →</button>
     </div>
 
-    <div class="map-container">
-      <div class="map-legend">
-        <div class="legend-item"><span class="ldot green"></span>Navigation libre</div>
-        <div class="legend-item"><span class="ldot red"></span>Zone protégée — interdit</div>
-        <div class="legend-item"><span class="ldot blue"></span>Chenal (vitesse réduite)</div>
-        <div class="legend-item"><span class="ldot marker"></span>Votre point de départ</div>
+    <!-- Step 3: Info -->
+    <div class="step" id="step3">
+      <button class="back" id="back2">← Retour</button>
+      <h3>Vos coordonnées</h3>
+      <div class="recap" id="recap"></div>
+      <div class="fields">
+        <div class="field-row">
+          <div class="field"><label>Prénom & Nom</label><input id="fName" type="text" placeholder="Jean Dupont"></div>
+          <div class="field"><label>Téléphone</label><input id="fPhone" type="tel" placeholder="+33 6 00 00 00 00"></div>
+        </div>
+        <div class="field"><label>Email</label><input id="fEmail" type="email" placeholder="jean@email.com"></div>
+        <div class="field"><label>Message <span class="opt">optionnel</span></label><textarea id="fMsg" rows="3" placeholder="Nombre de personnes, questions…"></textarea></div>
+        <button class="btn btn-full" id="submitBtn">Envoyer ma demande</button>
+        <p class="fine">Aucun paiement maintenant. Confirmation sous 2h par email.</p>
       </div>
-
-      <div class="map-frame">
-        <svg class="basin-svg" viewBox="0 0 800 580" xmlns="http://www.w3.org/2000/svg">
-          <!-- ── Background : Atlantique ── -->
-          <rect width="800" height="580" fill="#D6EAF8"/>
-
-          <!-- ── Océan Atlantique label zone ── -->
-          <rect width="145" height="580" fill="#BCD9EE"/>
-
-          <!-- ── Bassin d'Arcachon (eau) ── -->
-          <path d="
-            M145 118
-            C165 95 210 82 270 78
-            C330 73 400 75 465 83
-            C520 90 565 105 595 128
-            C625 150 638 180 633 215
-            C628 252 610 285 584 313
-            C555 344 518 368 476 385
-            C430 402 378 410 330 407
-            C278 404 230 393 192 373
-            C154 352 132 322 126 285
-            C118 248 126 195 145 118Z
-          " fill="#A9CCE3"/>
-
-          <!-- ── Terre nord (Cap Ferret péninsule) ── -->
-          <path d="M0 0 L145 0 L145 118 C135 145 128 180 125 220 C121 260 128 290 135 315 C110 305 85 295 65 305 C42 316 28 340 18 365 C8 388 0 415 0 440Z" fill="#E8DCC8"/>
-          <!-- Cap Ferret tip detail -->
-          <path d="M145 118 C138 135 132 158 128 185 C125 205 122 225 122 245 C118 240 112 235 105 232 C95 228 83 228 72 233 C58 240 48 252 40 268" stroke="#D4C5A9" stroke-width="2" fill="none"/>
-
-          <!-- ── Terre nord haut ── -->
-          <path d="M0 0 L800 0 L800 72 Q740 68 680 70 Q610 66 545 70 Q480 65 415 70 Q350 65 290 72 Q240 76 200 80 Q175 83 145 90 L145 0Z" fill="#E8DCC8"/>
-
-          <!-- ── Terre sud (Arcachon, La Teste, Pyla) ── -->
-          <path d="
-            M130 580 L800 580 L800 340
-            Q775 360 748 378
-            Q715 400 675 415
-            Q630 430 585 432
-            Q545 434 520 420
-            Q498 408 478 390
-            Q454 405 418 412
-            Q375 420 330 418
-            Q280 416 240 405
-            Q200 392 172 374
-            Q148 355 132 328
-            Q118 303 120 280
-            L118 300 L110 340 L105 380 L105 580Z
-          " fill="#E8DCC8"/>
-
-          <!-- Dune du Pilat detail (bump on south shore) -->
-          <path d="M620 432 Q635 415 650 410 Q665 405 680 415" fill="#D4C5A9" stroke="#C8B888" stroke-width="1"/>
-
-          <!-- ── GREEN ZONE — Navigation autorisée ── -->
-          <path d="
-            M220 140
-            C255 122 305 114 360 112
-            C415 110 465 118 505 136
-            C540 152 560 175 562 205
-            C564 238 548 268 522 292
-            C492 320 452 338 408 345
-            C362 352 315 345 278 328
-            C238 308 215 276 208 240
-            C200 202 208 165 220 140Z
-          " fill="rgba(76,175,80,0.15)" stroke="#4CAF50" stroke-width="1.5" stroke-dasharray="8,4"/>
-
-          <!-- ── RED ZONE 1 : Île aux Oiseaux (réserve) ── -->
-          <ellipse cx="388" cy="248" rx="62" ry="48" fill="rgba(244,67,54,0.12)" stroke="#F44336" stroke-width="1.5" stroke-dasharray="6,3"/>
-          <!-- Île aux Oiseaux — land mass -->
-          <ellipse cx="388" cy="248" rx="38" ry="26" fill="#C8B888"/>
-          <ellipse cx="388" cy="248" rx="34" ry="22" fill="#D4C5A0"/>
-          <!-- Cabanes tchanquées (iconic stilt huts) -->
-          <g transform="translate(374, 240)">
-            <rect x="0" y="5" width="8" height="10" fill="#8B6914" rx="1"/>
-            <polygon points="0,5 4,0 8,5" fill="#7A5C10"/>
-            <line x1="4" y1="15" x2="4" y2="20" stroke="#7A5C10" stroke-width="1.5"/>
-            <line x1="1" y1="20" x2="7" y2="20" stroke="#7A5C10" stroke-width="1"/>
-          </g>
-          <g transform="translate(390, 238)">
-            <rect x="0" y="5" width="8" height="10" fill="#8B6914" rx="1"/>
-            <polygon points="0,5 4,0 8,5" fill="#7A5C10"/>
-            <line x1="4" y1="15" x2="4" y2="20" stroke="#7A5C10" stroke-width="1.5"/>
-            <line x1="1" y1="20" x2="7" y2="20" stroke="#7A5C10" stroke-width="1"/>
-          </g>
-          <text x="388" y="210" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#555" font-weight="600" letter-spacing="0.3">Île aux Oiseaux</text>
-          <text x="388" y="223" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#888" font-weight="400">Zone protégée</text>
-
-          <!-- ── RED ZONE 2 : Banc d'Arguin ── -->
-          <ellipse cx="188" cy="295" rx="38" ry="58" fill="rgba(244,67,54,0.10)" stroke="#F44336" stroke-width="1.5" stroke-dasharray="6,3"/>
-          <ellipse cx="188" cy="295" rx="24" ry="38" fill="#C8B888" opacity="0.7"/>
-          <ellipse cx="188" cy="295" rx="18" ry="28" fill="#D4C5A0" opacity="0.6"/>
-          <text x="188" y="268" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#555" font-weight="600">Banc d'Arguin</text>
-          <text x="188" y="280" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#888">Zone protégée</text>
-
-          <!-- ── CHENAL BLEU — Passe Nord ── -->
-          <path d="M145 128 C130 150 118 178 114 210 C110 238 115 260 122 280" stroke="#4A90D9" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.45"/>
-          <!-- ── CHENAL BLEU — Passe Sud ── -->
-          <path d="M132 330 C118 355 108 382 106 410 C104 432 112 455 124 472" stroke="#4A90D9" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.45"/>
-
-          <!-- ── PORT D'ARCACHON MARKER ── -->
-          <circle cx="510" cy="385" r="16" fill="rgba(0,92,230,0.15)" stroke="#005CE6" stroke-width="1.5"/>
-          <circle cx="510" cy="385" r="7" fill="#005CE6"/>
-          <circle cx="510" cy="385" r="4" fill="white"/>
-          <text x="510" y="410" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#005CE6" font-weight="700">Port d'Arcachon</text>
-          <text x="510" y="423" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#005CE6" font-weight="400">Votre point de départ</text>
-
-          <!-- ── LABELS GÉOGRAPHIQUES ── -->
-          <!-- Cap Ferret -->
-          <text x="76" y="96" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11.5" fill="#5A7FA5" font-weight="600">Cap Ferret</text>
-          <!-- Arcachon city -->
-          <text x="555" y="458" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#7A8FA5" font-weight="500">Arcachon</text>
-          <!-- La Teste -->
-          <text x="620" y="470" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#7A8FA5" font-weight="400">La Teste</text>
-          <!-- Dune du Pilat -->
-          <text x="680" y="448" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#8A9AAA" font-style="italic">Dune du Pyla</text>
-          <!-- Andernos -->
-          <text x="440" y="115" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#7A8FA5" font-weight="400">Andernos</text>
-          <!-- Passe labels -->
-          <text x="70" y="190" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#4A7AB5" font-weight="500" transform="rotate(-75,70,190)">Passe Nord</text>
-          <text x="70" y="385" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#4A7AB5" font-weight="500" transform="rotate(-75,70,385)">Passe Sud</text>
-
-          <!-- ── ATLANTIQUE label ── -->
-          <text x="72" y="480" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="#4A7AB5" font-weight="600" letter-spacing="2" transform="rotate(-90,72,460)">ATLANTIQUE</text>
-
-          <!-- ── COMPASS ROSE ── -->
-          <g transform="translate(728, 520)">
-            <circle r="22" fill="white" opacity="0.92" stroke="#E5E7EB" stroke-width="1"/>
-            <line x1="0" y1="-14" x2="0" y2="14" stroke="#BCC4CC" stroke-width="1"/>
-            <line x1="-14" y1="0" x2="14" y2="0" stroke="#BCC4CC" stroke-width="1"/>
-            <polygon points="0,-14 -4,-5 0,-8 4,-5" fill="#0A0F1E"/>
-            <polygon points="0,14 -4,5 0,8 4,5" fill="#BCC4CC"/>
-            <text text-anchor="middle" y="-16" font-size="9" fill="#0A0F1E" font-weight="700" font-family="DM Sans">N</text>
-            <text text-anchor="middle" y="22" font-size="8" fill="#BCC4CC" font-family="DM Sans">S</text>
-            <text text-anchor="start" x="16" y="3" font-size="8" fill="#BCC4CC" font-family="DM Sans">E</text>
-            <text text-anchor="end" x="-16" y="3" font-size="8" fill="#BCC4CC" font-family="DM Sans">O</text>
-          </g>
-
-          <!-- Scale bar -->
-          <g transform="translate(30, 550)">
-            <line x1="0" y1="0" x2="60" y2="0" stroke="#8AA0B8" stroke-width="2"/>
-            <line x1="0" y1="-4" x2="0" y2="4" stroke="#8AA0B8" stroke-width="1.5"/>
-            <line x1="60" y1="-4" x2="60" y2="4" stroke="#8AA0B8" stroke-width="1.5"/>
-            <text x="30" y="-8" text-anchor="middle" font-size="8.5" fill="#8AA0B8" font-family="DM Sans">≈ 5 km</text>
-          </g>
-        </svg>
-      </div>
-
-      <p class="map-note">
-        ⚠️ La navigation dans les zones rouges est strictement interdite et sanctionnée. En cas de doute, suivez les indications de votre briefing.
-      </p>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════ CONTACT ═══════════════════════════ -->
-  <section class="contact-section" id="contact">
-    <div class="section-head">
-      <p class="eyebrow">Réservation</p>
-      <h2 class="section-title">Réservez votre sortie</h2>
-      <p class="section-sub">Réponse sous 2h. Aucun paiement avant votre arrivée au port.</p>
     </div>
 
-    <div class="contact-wrap">
-      <!-- Infos -->
-      <div class="contact-aside">
-        <div class="contact-info-block">
-          <div class="ci-item">
-            <div class="ci-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <div>
-              <p class="ci-label">Départ</p>
-              <p class="ci-val">Port d'Arcachon, Gironde (33)</p>
-            </div>
-          </div>
-          <div class="ci-item">
-            <div class="ci-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <div>
-              <p class="ci-label">Saison</p>
-              <p class="ci-val">Mai à Septembre · 7h – 20h</p>
-            </div>
-          </div>
-          <div class="ci-item">
-            <div class="ci-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.7h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.1a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.42 17.4"/></svg>
-            </div>
-            <div>
-              <p class="ci-label">Téléphone</p>
-              <p class="ci-val">+33 (0)5 XX XX XX XX</p>
-            </div>
-          </div>
-          <div class="ci-item">
-            <div class="ci-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-            <div>
-              <p class="ci-label">Email</p>
-              <p class="ci-val">contact@jetski-arcachon.fr</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="contact-note">
-          <p>📋 <strong>Permis côtier obligatoire</strong> pour la location libre. Sans permis, renseignez-vous sur nos <a href="#">randonnées encadrées</a>.</p>
-        </div>
-      </div>
-
-      <!-- Form -->
-      <form class="contact-form" id="contactForm" novalidate>
-        <div class="form-row">
-          <div class="fg">
-            <label for="fname">Prénom & Nom</label>
-            <input id="fname" type="text" placeholder="Jean Dupont" required autocomplete="name">
-          </div>
-          <div class="fg">
-            <label for="femail">Email</label>
-            <input id="femail" type="email" placeholder="jean@email.com" required autocomplete="email">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="fg">
-            <label for="fphone">Téléphone</label>
-            <input id="fphone" type="tel" placeholder="+33 6 00 00 00 00" autocomplete="tel">
-          </div>
-          <div class="fg">
-            <label for="fdate">Date souhaitée</label>
-            <input id="fdate" type="date" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="fg">
-            <label for="fmodel">Modèle</label>
-            <select id="fmodel" required>
-              <option value="">Choisir un modèle</option>
-              <option value="gti">GTI SE 130 — Découverte (110 €/h)</option>
-              <option value="gtx">GTX 230 — Sport (125 €/h)</option>
-              <option value="rxt">RXT-X 300 — Performance (140 €/h)</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label for="fduration">Durée</label>
-            <select id="fduration" required>
-              <option value="">Choisir une durée</option>
-              <option value="1h">1 heure</option>
-              <option value="2h">2 heures</option>
-              <option value="4h">Demi-journée (4h)</option>
-            </select>
-          </div>
-        </div>
-        <div class="fg fg--full">
-          <label for="fmsg">Message <span class="opt">optionnel</span></label>
-          <textarea id="fmsg" placeholder="Nombre de personnes, questions spécifiques, demande de groupe…" rows="4"></textarea>
-        </div>
-        <button type="submit" class="btn-primary btn-submit" id="submitBtn">
-          <span id="submitText">Envoyer ma demande</span>
-        </button>
-        <p class="form-legal">En soumettant ce formulaire, vous acceptez d'être contacté concernant votre demande de réservation. Aucun paiement n'est requis à ce stade.</p>
-      </form>
+    <!-- Step 4: Done -->
+    <div class="step step-done" id="step4">
+      <div class="check">✓</div>
+      <h3>Demande envoyée !</h3>
+      <p class="step-hint">Nous vous confirmons sous 2h par email.</p>
+      <button class="btn" id="doneBtn">Parfait</button>
     </div>
-  </section>
+  </div>
+</div>
 
-  <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand">JETSKI'N ARCACHON</div>
-      <p class="footer-tagline">Port d'Arcachon · Gironde · Mai – Septembre</p>
-      <div class="footer-links">
-        <a href="#">Mentions légales</a>
-        <a href="#">CGV</a>
-        <a href="#">Confidentialité</a>
-      </div>
-      <p class="footer-copy">© 2025 Jetski'n Arcachon · Tous droits réservés</p>
+<!-- AVAILABILITY -->
+<section class="avail" id="availability">
+  <div class="container">
+    <p class="eyebrow">Disponibilités</p>
+    <h2>Quand voulez-vous sortir ?</h2>
+    <p class="sec-sub">Les jours en gris sont complets. La saison s'étend de mai à septembre, 7h – 20h.</p>
+    <div class="avail-legend">
+      <span class="al-item"><i class="al-dot al-ok"></i>Disponible</span>
+      <span class="al-item"><i class="al-dot al-full"></i>Complet</span>
+      <span class="al-item"><i class="al-dot al-today"></i>Aujourd'hui</span>
     </div>
-  </footer>
+    <div class="avail-card">
+      <div class="cal-top">
+        <button class="cal-btn" id="availPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <span class="cal-title" id="availTitle"></span>
+        <button class="cal-btn" id="availNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>
+      <div class="cal-grid" id="availGrid"></div>
+    </div>
+  </div>
+</section>
 
-  <script src="script.js"></script>
+<!-- INCLUDES -->
+<section class="includes">
+  <div class="container">
+    <p class="eyebrow">Inclus dans chaque location</p>
+    <h2>Tout est prévu.</h2>
+    <div class="inc-grid">
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><p class="inc-name">Gilet de sauvetage</p><p class="inc-desc">Homologué CE, toutes tailles</p></div>
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg></div><p class="inc-name">Shorty néoprène</p><p class="inc-desc">Toutes tailles disponibles</p></div>
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><p class="inc-name">Briefing sécurité</p><p class="inc-desc">15 min avant chaque sortie</p></div>
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><p class="inc-name">Sac étanche</p><p class="inc-desc">Vos effets en sécurité</p></div>
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div><p class="inc-name">Carte de navigation</p><p class="inc-desc">Zones autorisées & interdites</p></div>
+      <div class="inc-card"><div class="inc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></div><p class="inc-name">Assurance RC</p><p class="inc-desc">Responsabilité civile incluse</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <p class="eyebrow">Tarifs</p>
+    <h2>Transparent,<br>sans surprise.</h2>
+    <p class="sec-sub">Carburant en sus · Caution 2 000 € · Permis côtier obligatoire</p>
+    <div class="price-table">
+      <div class="pt-row pt-head">
+        <div class="pt-c pt-c--name"></div>
+        <div class="pt-c">1 heure</div>
+        <div class="pt-c">2 heures</div>
+        <div class="pt-c pt-c--hl">Demi-journée<span>4 heures</span></div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-c pt-c--name"><b>GTI SE 130</b><span>Découverte</span></div>
+        <div class="pt-c">110 €</div>
+        <div class="pt-c">195 €</div>
+        <div class="pt-c pt-c--hl">360 €</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-c pt-c--name"><b>GTX 230</b><span>Sport</span></div>
+        <div class="pt-c">125 €</div>
+        <div class="pt-c">220 €</div>
+        <div class="pt-c pt-c--hl">395 €</div>
+      </div>
+      <div class="pt-row">
+        <div class="pt-c pt-c--name"><b>RXT-X 300</b><span>Performance</span></div>
+        <div class="pt-c">140 €</div>
+        <div class="pt-c">245 €</div>
+        <div class="pt-c pt-c--hl">430 €</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery">
+  <div class="gblock">
+    <div class="gimg"><!-- <img src="images/life1.jpg" alt="Pilotes sur le Bassin d'Arcachon"> --><div class="gph"><span>Photo lifestyle — pilotes sur le bassin</span></div></div>
+    <div class="gtxt">
+      <p class="eyebrow">L'expérience</p>
+      <h2>Le Bassin comme vous ne l'avez jamais vu.</h2>
+      <p>Découvrez les cabanes tchanquées, l'Île aux Oiseaux et la Dune du Pilat depuis l'eau. Un terrain de jeu unique à explorer seul, en duo ou en famille.</p>
+    </div>
+  </div>
+  <div class="gblock gblock--rev">
+    <div class="gimg"><!-- <img src="images/life2.jpg" alt="Vue sur le Bassin"> --><div class="gph"><span>Photo lifestyle — vue côte atlantique</span></div></div>
+    <div class="gtxt">
+      <p class="eyebrow">La sécurité</p>
+      <h2>Un briefing complet, chaque fois.</h2>
+      <p>Avant chaque sortie, notre équipe vous explique les règles de navigation, les zones protégées et le fonctionnement du jet ski. Vous partez serein.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="finalcta">
+  <div class="container center">
+    <h2>Prêt à prendre<br>le guidon ?</h2>
+    <p>Réservez en ligne, payez sur place.</p>
+    <a href="#models" class="btn btn--inv btn--lg">Réserver maintenant</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-row">
+    <span class="footer-brand">Jetski'n Arcachon</span>
+    <div class="footer-links"><a href="#">Mentions légales</a><a href="#">CGV</a><a href="#">Contact</a></div>
+    <span class="footer-copy">© 2025 Jetski'n Arcachon · Port d'Arcachon</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
