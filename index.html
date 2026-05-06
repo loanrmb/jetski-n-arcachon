@@ -17,7 +17,7 @@
       <a href="#models">Modèles</a>
       <a href="#availability">Disponibilités</a>
       <a href="#pricing">Tarifs</a>
-      <a href="#models" class="nav-cta">Réserver</a>
+      <a href="#models" class="nav-cta btn">Réserver</a>
     </div>
     <button class="burger" id="burger" aria-label="Menu"><span></span><span></span></button>
   </div>
@@ -41,62 +41,185 @@
   </div>
 </section>
 
-<!-- MODEL PICKER -->
+<!-- ══════════ MODELS — Tesla style ══════════ -->
 <section class="models" id="models">
-  <div class="model-header">
-    <span class="model-counter" id="modelCounter">01 / 03</span>
-    <h2 class="model-name" id="modelName">Sea-Doo GTI SE 130</h2>
-    <p class="model-tag" id="modelTag">Découverte · Débutant</p>
+
+  <!-- Tab switcher -->
+  <div class="mt-tabs" role="tablist">
+    <button class="mt-tab active" data-idx="0" role="tab">GTI SE 130</button>
+    <button class="mt-tab"        data-idx="1" role="tab">GTX 230</button>
+    <button class="mt-tab"        data-idx="2" role="tab">RXT-X 300</button>
   </div>
 
-  <div class="model-stage" id="modelStage">
-    <button class="arrow" id="prevBtn" aria-label="Précédent">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
+  <!-- Slides -->
+  <div class="mt-stage">
 
-    <div class="model-frame" id="modelFrame">
-      <!--
-        REMPLACER PAR UNE VRAIE PHOTO :
-        <img src="images/gti-side.jpg" alt="Sea-Doo GTI SE 130" class="model-photo">
-        Format recommandé : WebP 1400×700, fond blanc ou transparent
-      -->
-      <div class="model-placeholder" id="modelPlaceholder">
-        <svg class="model-svg" id="modelSvg" viewBox="0 0 560 200" fill="none">
-          <path d="M70 128 C92 96 148 74 220 68 L340 65 C410 63 462 73 496 92 C520 106 530 122 524 132 C518 142 500 146 476 145 L94 145 C72 145 55 138 70 128Z" id="svgBody" fill="#CBD5E1"/>
-          <path d="M220 68 L258 30 C264 23 277 20 290 24 L324 38 L340 65Z" id="svgCabin" fill="#B0BEC5"/>
-          <ellipse cx="148" cy="149" rx="30" ry="13" id="svgW1a" fill="#B0BEC5"/>
-          <ellipse cx="418" cy="149" rx="30" ry="13" id="svgW2a" fill="#B0BEC5"/>
-          <ellipse cx="148" cy="149" rx="20" ry="8" id="svgW1b" fill="#90A4AE"/>
-          <ellipse cx="418" cy="149" rx="20" ry="8" id="svgW2b" fill="#90A4AE"/>
-          <rect x="174" y="64" width="88" height="9" rx="4.5" id="svgLine" fill="#90A4AE" opacity="0.5"/>
+    <!-- Slide 0 — GTI SE 130 -->
+    <div class="mt-slide active" data-idx="0">
+      <div class="mt-img">
+        <!--
+          REMPLACER PAR PHOTO RÉELLE :
+          <img src="images/gti.webp" alt="Sea-Doo GTI SE 130">
+          Format : WebP 1400×700, fond transparent ou blanc
+        -->
+        <svg class="mt-svg" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="320" cy="218" rx="240" ry="26" fill="rgba(0,0,0,0.06)"/>
+          <path d="M80 188 Q105 108 252 94 Q320 88 378 106 L510 132 Q570 146 556 178 Q542 196 468 198 L132 198 Q82 198 80 188Z" fill="#CBD5E1"/>
+          <path d="M218 94 Q262 44 312 40 Q354 40 378 70 L390 106 L215 106Z" fill="#B0BEC5"/>
+          <rect x="342" y="72" width="78" height="14" rx="7" fill="#90A4AE" opacity="0.8"/>
+          <ellipse cx="168" cy="197" rx="36" ry="15" fill="#B0BEC5"/>
+          <ellipse cx="168" cy="197" rx="22" ry="9"  fill="#90A4AE"/>
+          <ellipse cx="444" cy="197" rx="36" ry="15" fill="#B0BEC5"/>
+          <ellipse cx="444" cy="197" rx="22" ry="9"  fill="#90A4AE"/>
+          <path d="M215 106 L222 94 L212 94Z" fill="#9EAFC0"/>
+          <line x1="252" y1="94" x2="250" y2="106" stroke="#9EAFC0" stroke-width="2"/>
         </svg>
-        <span class="model-ph-label" id="modelPhLabel">GTI SE 130</span>
+      </div>
+      <div class="mt-info">
+        <div class="mt-name-block">
+          <span class="mt-brand">Sea-Doo</span>
+          <span class="mt-model">GTI SE 130</span>
+          <span class="mt-level">Découverte · Débutant</span>
+        </div>
+        <div class="mt-right">
+          <div class="mt-specs">
+            <div class="mt-spec">
+              <span class="mt-sv">130 <em>ch</em></span>
+              <span class="mt-sl">Puissance</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">75 <em>km/h</em></span>
+              <span class="mt-sl">Vitesse max</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">3 <em>pers.</em></span>
+              <span class="mt-sl">Capacité</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">1 630 <em>cc</em></span>
+              <span class="mt-sl">Cylindrée</span>
+            </div>
+          </div>
+          <button class="btn btn-reserve" data-model="0">Réserver — 110 € <span class="btn-per">/h</span></button>
+        </div>
       </div>
     </div>
 
-    <button class="arrow" id="nextBtn" aria-label="Suivant">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-  </div>
-
-  <div class="specs-row">
-    <div class="spec"><span class="spec-val" id="svPower">130</span><span class="spec-unit">ch</span><span class="spec-lbl">Puissance</span></div>
-    <div class="spec-sep"></div>
-    <div class="spec"><span class="spec-val" id="svSpeed">75</span><span class="spec-unit">km/h</span><span class="spec-lbl">Vitesse max</span></div>
-    <div class="spec-sep"></div>
-    <div class="spec"><span class="spec-val" id="svSeats">3</span><span class="spec-unit">pers.</span><span class="spec-lbl">Capacité</span></div>
-    <div class="spec-sep"></div>
-    <div class="spec"><span class="spec-val" id="svCyl">1 630</span><span class="spec-unit">cc</span><span class="spec-lbl">Cylindrée</span></div>
-  </div>
-
-  <div class="model-foot">
-    <div class="dots" id="dotsEl">
-      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+    <!-- Slide 1 — GTX 230 -->
+    <div class="mt-slide" data-idx="1">
+      <div class="mt-img">
+        <!--
+          REMPLACER PAR PHOTO RÉELLE :
+          <img src="images/gtx.webp" alt="Sea-Doo GTX 230">
+        -->
+        <svg class="mt-svg" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="320" cy="218" rx="252" ry="27" fill="rgba(0,0,0,0.07)"/>
+          <path d="M72 185 Q98 100 256 84 Q326 78 390 98 L526 128 Q590 144 574 180 Q558 200 478 202 L124 202 Q74 202 72 185Z" fill="#BFDBFE"/>
+          <path d="M220 84 Q268 30 324 26 Q368 26 396 60 L410 100 L215 100Z" fill="#93C5FD"/>
+          <rect x="352" y="62" width="84" height="16" rx="8" fill="#60A5FA" opacity="0.9"/>
+          <ellipse cx="162" cy="201" rx="38" ry="16" fill="#93C5FD"/>
+          <ellipse cx="162" cy="201" rx="24" ry="10" fill="#60A5FA"/>
+          <ellipse cx="452" cy="201" rx="38" ry="16" fill="#93C5FD"/>
+          <ellipse cx="452" cy="201" rx="24" ry="10" fill="#60A5FA"/>
+          <path d="M215 100 L224 84 L213 84Z" fill="#7BB8F0"/>
+          <line x1="260" y1="84" x2="258" y2="100" stroke="#7BB8F0" stroke-width="2"/>
+          <path d="M320 26 L318 100" stroke="#7BB8F0" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="mt-info">
+        <div class="mt-name-block">
+          <span class="mt-brand">Sea-Doo</span>
+          <span class="mt-model">GTX 230</span>
+          <span class="mt-level">Sport · Intermédiaire</span>
+        </div>
+        <div class="mt-right">
+          <div class="mt-specs">
+            <div class="mt-spec">
+              <span class="mt-sv">230 <em>ch</em></span>
+              <span class="mt-sl">Puissance</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">95 <em>km/h</em></span>
+              <span class="mt-sl">Vitesse max</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">3 <em>pers.</em></span>
+              <span class="mt-sl">Capacité</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">1 630 <em>cc</em></span>
+              <span class="mt-sl">Cylindrée</span>
+            </div>
+          </div>
+          <button class="btn btn-reserve" data-model="1">Réserver — 125 € <span class="btn-per">/h</span></button>
+        </div>
+      </div>
     </div>
-    <button class="btn btn-reserve" id="reserveBtn">
-      Réserver — <span id="priceLabel">110 €</span><span class="btn-per">/h</span>
-    </button>
-  </div>
+
+    <!-- Slide 2 — RXT-X 300 -->
+    <div class="mt-slide" data-idx="2">
+      <div class="mt-img mt-img--dark">
+        <!--
+          REMPLACER PAR PHOTO RÉELLE :
+          <img src="images/rxt.webp" alt="Sea-Doo RXT-X 300">
+        -->
+        <svg class="mt-svg" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="320" cy="218" rx="260" ry="28" fill="rgba(0,0,0,0.22)"/>
+          <path d="M66 182 Q92 94 258 76 Q330 70 398 92 L540 124 Q606 142 588 182 Q570 204 484 206 L118 206 Q68 206 66 182Z" fill="#334155"/>
+          <path d="M222 76 Q272 18 334 14 Q382 14 412 52 L428 96 L216 96Z" fill="#1E293B"/>
+          <rect x="364" y="56" width="88" height="18" rx="9" fill="#475569" opacity="0.9"/>
+          <ellipse cx="158" cy="205" rx="40" ry="17" fill="#334155"/>
+          <ellipse cx="158" cy="205" rx="25" ry="11" fill="#475569"/>
+          <ellipse cx="460" cy="205" rx="40" ry="17" fill="#334155"/>
+          <ellipse cx="460" cy="205" rx="25" ry="11" fill="#475569"/>
+          <path d="M216 96 L226 76 L214 76Z" fill="#4A5568"/>
+          <line x1="264" y1="76" x2="262" y2="96" stroke="#64748B" stroke-width="2"/>
+          <path d="M330 14 L328 96" stroke="#64748B" stroke-width="1.5" opacity="0.4"/>
+          <path d="M370 14 L368 96" stroke="#64748B" stroke-width="1" opacity="0.3"/>
+          <!-- Spoiler detail -->
+          <rect x="380" y="66" width="96" height="6" rx="3" fill="#64748B" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="mt-info mt-info--dark">
+        <div class="mt-name-block">
+          <span class="mt-brand">Sea-Doo</span>
+          <span class="mt-model">RXT-X 300</span>
+          <span class="mt-level">Performance · Expert</span>
+        </div>
+        <div class="mt-right">
+          <div class="mt-specs">
+            <div class="mt-spec">
+              <span class="mt-sv">300 <em>ch</em></span>
+              <span class="mt-sl">Puissance</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">110 <em>km/h</em></span>
+              <span class="mt-sl">Vitesse max</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">3 <em>pers.</em></span>
+              <span class="mt-sl">Capacité</span>
+            </div>
+            <div class="mt-sep"></div>
+            <div class="mt-spec">
+              <span class="mt-sv">1 630 <em>cc</em></span>
+              <span class="mt-sl">Cylindrée</span>
+            </div>
+          </div>
+          <button class="btn btn-reserve" data-model="2">Réserver — 140 € <span class="btn-per">/h</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.mt-stage -->
 </section>
 
 <!-- BOOKING MODAL -->
@@ -245,7 +368,7 @@
 <!-- GALLERY -->
 <section class="gallery">
   <div class="gblock">
-    <div class="gimg"><!-- <img src="images/life1.jpg" alt="Pilotes sur le Bassin d'Arcachon"> --><div class="gph"><span>Photo lifestyle — pilotes sur le bassin</span></div></div>
+    <div class="gimg"><div class="gph"><span>Photo lifestyle — pilotes sur le bassin</span></div></div>
     <div class="gtxt">
       <p class="eyebrow">L'expérience</p>
       <h2>Le Bassin comme vous ne l'avez jamais vu.</h2>
@@ -253,7 +376,7 @@
     </div>
   </div>
   <div class="gblock gblock--rev">
-    <div class="gimg"><!-- <img src="images/life2.jpg" alt="Vue sur le Bassin"> --><div class="gph"><span>Photo lifestyle — vue côte atlantique</span></div></div>
+    <div class="gimg"><div class="gph"><span>Photo lifestyle — vue côte atlantique</span></div></div>
     <div class="gtxt">
       <p class="eyebrow">La sécurité</p>
       <h2>Un briefing complet, chaque fois.</h2>
