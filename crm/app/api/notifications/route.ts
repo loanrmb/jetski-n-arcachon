@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
-import { resend, FROM_EMAIL, STAFF_EMAIL } from '@/lib/resend'
+import { getResend, FROM_EMAIL, STAFF_EMAIL } from '@/lib/resend'
 import {
   emailDemandeRecue,
   emailConfirmation,
@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
   const client_name    = `${client.first_name} ${client.last_name}`
   const client_email   = client.email
   const resWithClient  = { ...r, client_first_name: client.first_name, client_name, client_email }
+
+  const resend = getResend()
 
   try {
     switch (event) {
