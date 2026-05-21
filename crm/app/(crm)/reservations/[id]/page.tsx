@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDateTime } from '@/lib/utils'
-import { STATUS_LABELS, type Reservation, type JetSki, type Client, type ReservationLog } from '@/types'
+import { STATUS_LABELS, type Reservation, type JetSki, type Client, type ReservationLog, type ReservationStatus } from '@/types'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
@@ -71,8 +71,8 @@ export default async function ReservationDetailPage({ params }: { params: { id: 
                   {auditLogs.map(log => (
                     <TableRow key={log.id}>
                       <TableCell className="text-sm">{formatDateTime(log.created_at)}</TableCell>
-                      <TableCell className="text-sm">{log.old_status ? STATUS_LABELS[log.old_status as any] : '—'}</TableCell>
-                      <TableCell className="text-sm">{log.new_status ? STATUS_LABELS[log.new_status as any] : '—'}</TableCell>
+                      <TableCell className="text-sm">{log.old_status ? STATUS_LABELS[log.old_status as ReservationStatus] : '—'}</TableCell>
+                      <TableCell className="text-sm">{log.new_status ? STATUS_LABELS[log.new_status as ReservationStatus] : '—'}</TableCell>
                       <TableCell className="text-sm">{log.changed_by_email ?? 'Système'}</TableCell>
                     </TableRow>
                   ))}
