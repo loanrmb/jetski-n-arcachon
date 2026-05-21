@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 25 95% 53%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ── Micro-animations ─────────────────────────────────────────────────────── */
+
+/* Cards that are clickable / interactive get a lift on hover */
+.card-interactive {
+  @apply transition-all duration-200 hover:shadow-md hover:-translate-y-[1px];
+}
+
+/* Stat / KPI cards */
+.kpi-card {
+  @apply transition-all duration-200 hover:shadow-md;
+}
+
+/* Row hover in tables */
+tr.row-hover {
+  @apply transition-colors duration-100;
+}
+
+/* Dialog entrance: shadcn sets data-state="open"/"closed"; we enhance the animation */
+[data-radix-popper-content-wrapper] {
+  animation-duration: 180ms !important;
+}
+
+/* Smooth sidebar active indicator */
+.sidebar-link {
+  @apply relative transition-all duration-150;
+}
+.sidebar-link.active::before {
+  content: '';
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent rounded-r-full;
+}
+
+/* FullCalendar overrides */
+.fc .fc-toolbar-title {
+  @apply text-base font-semibold capitalize;
+}
+.fc .fc-button {
+  @apply bg-slate-900 border-slate-900 text-white text-sm px-3 py-1.5 rounded-md;
+}
+.fc .fc-button:hover {
+  @apply bg-slate-700 border-slate-700;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  @apply bg-orange-500 border-orange-500;
+}
+.fc .fc-daygrid-day.fc-day-today,
+.fc .fc-timegrid-col.fc-day-today {
+  background: hsl(25 95% 53% / 0.06) !important;
+}
+.fc-event {
+  cursor: pointer;
+  border-radius: 4px !important;
+  font-size: 12px;
+}
+.fc .fc-timegrid-slot {
+  height: 2.5rem;
+}
