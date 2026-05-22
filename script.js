@@ -532,7 +532,7 @@ $('submitBtn').addEventListener('click', async function () {
     // Insert pending reservation.
     // requested_jet_ski: the model the user selected (or null for staff to assign freely).
     // jet_ski_id stays null — staff assigns the physical unit in the CRM.
-    const { error: resErr } = await sb.from('reservations').insert({
+    const reservationPayload = {
       client_id:         clientId,
       jet_ski_id:        null,
       date:              selectedDate,
@@ -544,7 +544,9 @@ $('submitBtn').addEventListener('click', async function () {
       license_verified:  'not_verified',
       client_message:    msg || null,
       requested_jet_ski: selectedJetSki,
-    });
+    };
+    console.log('[booking] reservation payload:', reservationPayload);
+    const { error: resErr } = await sb.from('reservations').insert(reservationPayload);
 
     if (resErr) throw new Error(resErr.message);
 

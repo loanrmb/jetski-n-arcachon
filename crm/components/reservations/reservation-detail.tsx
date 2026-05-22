@@ -162,13 +162,19 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
           <div>
             <dt className="text-muted-foreground text-xs mb-0.5">Jet ski</dt>
             <dd className="font-medium flex items-center gap-1.5">
-              {r.jet_ski && (
-                <span
-                  className="h-2.5 w-2.5 rounded-full inline-block shrink-0"
-                  style={{ backgroundColor: r.jet_ski.color }}
-                />
+              {r.jet_ski ? (
+                <>
+                  <span
+                    className="h-2.5 w-2.5 rounded-full inline-block shrink-0"
+                    style={{ backgroundColor: r.jet_ski.color }}
+                  />
+                  {r.jet_ski.name}
+                </>
+              ) : r.requested_jet_ski ? (
+                <span className="text-muted-foreground">Demandé : {r.requested_jet_ski}</span>
+              ) : (
+                '—'
               )}
-              {r.jet_ski?.name}
             </dd>
           </div>
           <div>

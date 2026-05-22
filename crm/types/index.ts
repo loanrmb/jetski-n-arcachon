@@ -48,6 +48,7 @@ export interface Reservation {
   fuel_note?: string
   caution_collected: boolean
   price_total?: number
+  requested_jet_ski?: string
   created_at: string
   updated_at: string
   jet_ski?: JetSki
