@@ -16,9 +16,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    CONSTANTS
 ───────────────────────────── */
 const MODELS = [
-  { name: 'Sea-Doo GTI SE 130', dbName: 'GTI SE 130', price: '110 €' },
-  { name: 'Sea-Doo GTX 230',    dbName: 'GTX 230',    price: '125 €' },
-  { name: 'Sea-Doo RXT-X 300',  dbName: 'RXT-X 300',  price: '140 €' },
+  { name: 'Sea-Doo GTI SE 130', dbName: 'GTI SE 130', price: '110 €', prices: { 1: '110 €', 2: '195 €', 4: '360 €' } },
+  { name: 'Sea-Doo GTX 230',    dbName: 'GTX 230',    price: '125 €', prices: { 1: '125 €', 2: '220 €', 4: '395 €' } },
+  { name: 'Sea-Doo RXT-X 300',  dbName: 'RXT-X 300',  price: '140 €', prices: { 1: '140 €', 2: '245 €', 4: '430 €' } },
 ];
 
 // Must match slot_time values in the DB
@@ -258,12 +258,23 @@ document.querySelectorAll('.dslot').forEach(btn => {
     document.querySelectorAll('.dslot').forEach(b => b.classList.remove('sel'));
     btn.classList.add('sel');
     updateStep3Btn();
+    updateDurPrice();
   });
 });
 
 // "Continuer →" only unlocks when BOTH a slot AND a duration are selected
 function updateStep3Btn() {
   $('toStep3').disabled = !(selectedTime && selectedDuration);
+}
+
+// Show the price for the selected model + duration below the duration grid
+function updateDurPrice() {
+  const el = $('durPrice');
+  if (!el) return;
+  const m = MODELS.find(x => x.dbName === selectedJetSki);
+  if (!m || !selectedDuration) { el.textContent = ''; return; }
+  const durLabel = selectedDuration === 4 ? 'Demi-journée' : `${selectedDuration}h`;
+  el.textContent = `${m.prices[selectedDuration]} · ${durLabel}`;
 }
 
 /* ─────────────────────────────
@@ -275,7 +286,7 @@ const overlay = $('overlay');
 const ALL_STEP_IDS = ['step1', 'step2', 'step_model', 'step3', 'step4'];
 
 // Progress bar order (step4 is outside the bar — all items go "done" / none "active")
-const STEP_ORDER = ['step1', 'step2', 'step_model', 'step3'];
+const STEP_ORDER = ['step1', 'step_model', 'step2', 'step3'];
 const PS_MAP     = { step1: 'ps1', step2: 'ps2', step_model: 'ps_model', step3: 'ps3' };
 
 function goStep(stepId) {
@@ -326,6 +337,7 @@ function openModal(idx) {
     t.disabled = false;
   });
   document.querySelectorAll('.dslot').forEach(b => b.classList.remove('sel'));
+  $('durPrice').textContent = '';
 
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden', 'false');
@@ -338,17 +350,13 @@ function openModal(idx) {
 
 /* ─────────────────────────────
    OPEN MODAL — avail calendar path
-   Date is already known; 4-step flow (Date → Heure → Modèle → Infos).
+   Date is already known; 4-step flow (Date → Modèle → Heure → Infos).
+   Opens directly at step_model — step1 (calendar) is skipped.
 ───────────────────────────── */
 function openModalFromAvail(dateStr) {
   bookingFromAvail = true;
   selectedJetSki   = null;
   selectedDate     = dateStr;
-
-  // Show the month of the clicked date
-  const parts = dateStr.split('-');
-  calY = +parts[0];
-  calM = +parts[1] - 1;
 
   $('modalModelName').textContent = 'Tous modèles';
   document.getElementById('modal').classList.add('modal--avail');
@@ -356,6 +364,7 @@ function openModalFromAvail(dateStr) {
   selectedTime     = null;
   selectedDuration = null;
   $('toStep3').disabled = true;
+  $('durPrice').textContent = '';
 
   document.querySelectorAll('.tslot').forEach(t => {
     t.classList.remove('sel', 'tslot--disabled');
@@ -369,11 +378,7 @@ function openModalFromAvail(dateStr) {
   overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 
-  updateCalTitle();
-  buildCal('calGrid', calY, calM, true, selectedDate);
-  $('toStep2').disabled = false; // date already chosen
-
-  goStep('step1');
+  goStep('step_model');
 }
 
 function closeModal() {
@@ -405,7 +410,7 @@ $('calNext').addEventListener('click', () => {
   updateCalTitle(); buildCal('calGrid', calY, calM, true, selectedDate);
 });
 
-// Step 1 → Step 2
+// Step 1 → Step 2 (CTA path only)
 $('toStep2').addEventListener('click', () => {
   if (!selectedDate) return;
   const d = new Date(selectedDate + 'T12:00:00');
@@ -414,16 +419,13 @@ $('toStep2').addEventListener('click', () => {
   }).replace(/^\w/, c => c.toUpperCase());
   goStep('step2');
   renderTimeSlots();
+  updateDurPrice();
 });
 
-// Step 2 → Step 3 (model path) or Step 2 → Step_model (avail path)
+// Step 2 → Step 3 (both paths — model is already known by now)
 $('toStep3').addEventListener('click', () => {
-  if (bookingFromAvail) {
-    goStep('step_model');
-  } else {
-    buildRecap();
-    goStep('step3');
-  }
+  buildRecap();
+  goStep('step3');
 });
 
 /* ─────────────────────────────
@@ -439,32 +441,40 @@ document.querySelectorAll('.mslot').forEach(btn => {
   });
 });
 
-// Step_model → Step 3
+// Step_model → Step 2 (avail path: model chosen, now pick a slot)
 $('toStep3FromModel').addEventListener('click', () => {
   if (!selectedJetSki) return;
-  buildRecap();
-  goStep('step3');
+  const d = new Date(selectedDate + 'T12:00:00');
+  $('step2Date').textContent = d.toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }).replace(/^\w/, c => c.toUpperCase());
+  goStep('step2');
+  renderTimeSlots();
+  updateDurPrice();
 });
 
 /* ─────────────────────────────
    BACK BUTTONS
 ───────────────────────────── */
-$('back1').addEventListener('click', () => goStep('step1'));
-
-// Step 3 → Step_model (avail) or Step 2 (model path)
-$('back2').addEventListener('click', () => {
+// Step 2 → Step 1 (CTA) or Step_model (avail)
+$('back1').addEventListener('click', () => {
   if (bookingFromAvail) {
     goStep('step_model');
   } else {
-    goStep('step2');
-    renderTimeSlots();
+    goStep('step1');
   }
 });
 
-// Step_model → Step 2
-$('back_model').addEventListener('click', () => {
+// Step 3 → Step 2 (both paths)
+$('back2').addEventListener('click', () => {
   goStep('step2');
   renderTimeSlots();
+  updateDurPrice();
+});
+
+// Step_model → close modal (back to avail calendar section)
+$('back_model').addEventListener('click', () => {
+  closeModal();
 });
 
 /* ─────────────────────────────

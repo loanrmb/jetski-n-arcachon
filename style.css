@@ -508,6 +508,14 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .dslot.sel              { background: var(--blue); border-color: var(--blue); color: var(--white); }
 .dslot.sel em           { color: rgba(255,255,255,0.65); }
 
+.dur-price {
+  font-size: 0.82rem;
+  color: var(--text2);
+  text-align: center;
+  min-height: 1.2em;
+  margin-top: -4px;
+}
+
 /* ════════════════════════════════
    MODEL SELECTOR (step_model — avail path)
 ════════════════════════════════ */
