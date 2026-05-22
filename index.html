@@ -168,6 +168,12 @@
         <button class="tslot" data-t="14:00">14h00<em>Après-midi</em></button>
         <button class="tslot" data-t="16:00">16h00<em>Après-midi</em></button>
       </div>
+      <p class="step-hint" style="margin-top:8px">Durée souhaitée</p>
+      <div class="dur-grid">
+        <button class="dslot" data-d="1">1h<em>1 heure</em></button>
+        <button class="dslot" data-d="2">2h<em>2 heures</em></button>
+        <button class="dslot" data-d="4">½j<em>Demi-journée</em></button>
+      </div>
       <button class="btn btn-full" id="toStep3" disabled>Continuer →</button>
     </div>
     <div class="step" id="step3">
@@ -411,6 +417,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
 </body>
 </html>

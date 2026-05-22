@@ -195,6 +195,12 @@ CREATE POLICY "public_read_jet_skis" ON jet_skis
   FOR SELECT TO anon USING (true);
 CREATE POLICY "public_create_reservation" ON reservations
   FOR INSERT TO anon WITH CHECK (status = 'pending');
+CREATE POLICY "public_create_clients" ON clients
+  FOR INSERT TO anon
+  WITH CHECK (
+    email IS NOT NULL AND
+    email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+  );
 
 -- ============================================================
 -- DONNÉES INITIALES
@@ -202,9 +208,9 @@ CREATE POLICY "public_create_reservation" ON reservations
 
 INSERT INTO jet_skis (name, model, power_hp, max_speed_kmh, capacity, price_1h, price_2h, price_4h, status, color)
 VALUES
-  ('GTI SE 130', 'Sea-Doo GTI SE 130', 130, 75, 3, 110.00, 200.00, 380.00, 'active', '#3B82F6'),
-  ('GTX 230',    'Sea-Doo GTX 230',    230, 85, 3, 125.00, 230.00, 440.00, 'active', '#10B981'),
-  ('RXT-X 300',  'Sea-Doo RXT-X 300',  300, 95, 3, 140.00, 260.00, 500.00, 'active', '#EF4444');
+  ('GTI SE 130', 'Sea-Doo GTI SE 130', 130, 75, 3, 110.00, 195.00, 360.00, 'active', '#3B82F6'),
+  ('GTX 230',    'Sea-Doo GTX 230',    230, 85, 3, 125.00, 220.00, 395.00, 'active', '#10B981'),
+  ('RXT-X 300',  'Sea-Doo RXT-X 300',  300, 95, 3, 140.00, 245.00, 430.00, 'active', '#EF4444');
 
 -- ============================================================
 -- REALTIME (publication pour le site public)
