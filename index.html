@@ -143,7 +143,8 @@
     </button>
     <div class="progress" id="progress">
       <span class="ps" id="ps1">Date</span><span class="pl"></span>
-      <span class="ps" id="ps2">Heure</span><span class="pl"></span>
+      <span class="ps" id="ps2">Heure</span><span class="pl ps-model-only"></span>
+      <span class="ps ps-model-only" id="ps_model">Modèle</span><span class="pl"></span>
       <span class="ps" id="ps3">Infos</span>
     </div>
     <div class="step active" id="step1">
@@ -176,6 +177,29 @@
       </div>
       <button class="btn btn-full" id="toStep3" disabled>Continuer →</button>
     </div>
+    <div class="step" id="step_model">
+      <button class="back" id="back_model">← Retour</button>
+      <h3>Choisissez un modèle</h3>
+      <p class="step-hint">Sélectionnez le jet ski que vous souhaitez.</p>
+      <div class="model-grid">
+        <button class="mslot" data-model-idx="0">
+          <span class="mslot-name">GTI SE 130</span>
+          <span class="mslot-level">Découverte</span>
+          <span class="mslot-price">110 € <em>/h</em></span>
+        </button>
+        <button class="mslot" data-model-idx="1">
+          <span class="mslot-name">GTX 230</span>
+          <span class="mslot-level">Sport</span>
+          <span class="mslot-price">125 € <em>/h</em></span>
+        </button>
+        <button class="mslot" data-model-idx="2">
+          <span class="mslot-name">RXT-X 300</span>
+          <span class="mslot-level">Performance</span>
+          <span class="mslot-price">140 € <em>/h</em></span>
+        </button>
+      </div>
+      <button class="btn btn-full" id="toStep3FromModel" disabled>Continuer →</button>
+    </div>
     <div class="step" id="step3">
       <button class="back" id="back2">← Retour</button>
       <h3>Vos coordonnées</h3>
@@ -205,7 +229,7 @@
   <div class="container">
     <p class="eyebrow">Disponibilités</p>
     <h2>Quand voulez-vous sortir ?</h2>
-    <p class="sec-sub">Les jours barrés sont complets. La saison s'étend de mai à septembre, 7h – 20h.</p>
+    <p class="sec-sub">Les jours barrés sont complets. Cliquez sur un jour disponible pour démarrer votre réservation. La saison s'étend de mai à septembre, 7h – 20h.</p>
     <div class="avail-legend">
       <span class="al-item"><i class="al-dot al-ok"></i>Disponible</span>
       <span class="al-item"><i class="al-dot al-full"></i>Complet</span>

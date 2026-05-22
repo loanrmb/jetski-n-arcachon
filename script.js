@@ -16,9 +16,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    CONSTANTS
 ───────────────────────────── */
 const MODELS = [
-  { name: 'Sea-Doo GTI SE 130', price: '110 €' },
-  { name: 'Sea-Doo GTX 230',    price: '125 €' },
-  { name: 'Sea-Doo RXT-X 300',  price: '140 €' },
+  { name: 'Sea-Doo GTI SE 130', dbName: 'GTI SE 130', price: '110 €' },
+  { name: 'Sea-Doo GTX 230',    dbName: 'GTX 230',    price: '125 €' },
+  { name: 'Sea-Doo RXT-X 300',  dbName: 'RXT-X 300',  price: '140 €' },
 ];
 
 // Must match slot_time values in the DB
@@ -40,7 +40,6 @@ const $ = id => document.getElementById(id);
    STATE
 ───────────────────────────── */
 let currentModel     = 0;
-let bookingModel     = 0;
 let calY             = TODAY.getFullYear();
 let calM             = TODAY.getMonth();
 let availY           = TODAY.getFullYear();
@@ -48,18 +47,22 @@ let availM           = TODAY.getMonth();
 let selectedDate     = null;
 let selectedTime     = null;
 let selectedDuration = null;
+let selectedJetSki   = null;   // MODELS[n].dbName, or null (avail path before model selection)
+let bookingFromAvail = false;  // true when opened from availability calendar
 
 // Supabase-backed availability
-let jetSkiIds  = [];        // active jet ski UUIDs (fetched once)
-let blockedSet = new Set(); // "YYYY-MM-DD|HH:MM|jet_ski_id" — all is_blocked=true rows
+let jetSkis   = [];        // {id, name} — active jet skis
+let jetSkiIds = [];        // UUID list derived from jetSkis
+let blockedSet = new Set(); // "YYYY-MM-DD|HH:MM|jet_ski_id"
 
 /* ─────────────────────────────
    SUPABASE — DATA LAYER
 ───────────────────────────── */
 
-async function fetchJetSkiIds() {
-  const { data } = await sb.from('jet_skis').select('id').eq('status', 'active');
-  jetSkiIds = (data ?? []).map(r => r.id);
+async function fetchJetSkis() {
+  const { data } = await sb.from('jet_skis').select('id,name').eq('status', 'active');
+  jetSkis   = data ?? [];
+  jetSkiIds = jetSkis.map(r => r.id);
 }
 
 // Fetch all blocked slots from today → +1 year (covers the full next season).
@@ -85,7 +88,7 @@ async function fetchBlocked() {
    AVAILABILITY HELPERS
 ───────────────────────────── */
 
-// A day is "Complet" only when all 3 jet skis × all 4 slots are blocked (12 combos).
+// A day is "Complet" only when all jet skis × all 4 slots are blocked.
 function isDayFull(dateStr) {
   if (!jetSkiIds.length) return false;
   return SLOT_TIMES.every(slot =>
@@ -115,7 +118,7 @@ async function onLiveUpdate() {
   renderAvail();
   if (overlay.classList.contains('open')) {
     buildCal('calGrid', calY, calM, true, selectedDate);
-    if (steps[1].classList.contains('active') && selectedDate) renderTimeSlots();
+    if ($('step2')?.classList.contains('active') && selectedDate) renderTimeSlots();
   }
 }
 
@@ -148,21 +151,23 @@ mtTabs.forEach(tab => {
 });
 
 /* ─────────────────────────────
-   RESERVE BUTTONS
+   RESERVE BUTTONS (model CTA)
+   Each .btn-reserve has data-model="0|1|2" matching MODELS index.
 ───────────────────────────── */
 document.querySelectorAll('.btn-reserve').forEach(btn => {
   btn.addEventListener('click', () => {
-    bookingModel = +(btn.dataset.model ?? currentModel);
-    openModal();
+    const idx = +(btn.dataset.model ?? currentModel);
+    openModal(idx);
   });
 });
 
 /* ─────────────────────────────
    CALENDAR BUILDER
-   Now uses full "YYYY-MM-DD" date strings instead of bare day
-   numbers — fixes the bug where the same days were blocked every month.
+   onDateClick — optional callback(dateStr).
+   When supplied (avail calendar), a date click calls the callback instead
+   of the default modal-calendar behavior (select date in current modal).
 ───────────────────────────── */
-function buildCal(gridId, year, month, interactive, selDate) {
+function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
   const grid = $(gridId);
   if (!grid) return;
   const first = new Date(year, month, 1).getDay();
@@ -175,11 +180,11 @@ function buildCal(gridId, year, month, interactive, selDate) {
   for (let d = 1; d <= days; d++) {
     const date    = new Date(year, month, d);
     date.setHours(0, 0, 0, 0);
-    const isPast   = date < TODAY;
-    const isToday  = date.getTime() === TODAY.getTime();
-    const dateStr  = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const isFull   = !isPast && isDayFull(dateStr);
-    const isSel    = interactive && selDate === dateStr;
+    const isPast  = date < TODAY;
+    const isToday = date.getTime() === TODAY.getTime();
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const isFull  = !isPast && isDayFull(dateStr);
+    const isSel   = interactive && selDate === dateStr;
 
     let cls = 'cal-d';
     if (isSel)        cls += ' cal-d--sel';
@@ -197,6 +202,11 @@ function buildCal(gridId, year, month, interactive, selDate) {
   if (interactive) {
     grid.querySelectorAll('.cal-d[data-date]').forEach(el => {
       el.addEventListener('click', () => {
+        if (onDateClick) {
+          onDateClick(el.dataset.date);
+          return;
+        }
+        // Default: modal-calendar behavior
         selectedDate = el.dataset.date;
         buildCal(gridId, year, month, true, selectedDate);
         $('toStep2').disabled = false;
@@ -257,50 +267,33 @@ function updateStep3Btn() {
 }
 
 /* ─────────────────────────────
-   BOOKING MODAL
+   STEP NAVIGATION
 ───────────────────────────── */
 const overlay = $('overlay');
-const steps   = ['step1', 'step2', 'step3', 'step4'].map($);
-const psEls   = ['ps1',   'ps2',   'ps3'].map($);
 
-function openModal() {
-  $('modalModelName').textContent = MODELS[bookingModel].name;
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
+// All step IDs in document order
+const ALL_STEP_IDS = ['step1', 'step2', 'step_model', 'step3', 'step4'];
 
-  // Reset booking state
-  calY = TODAY.getFullYear();
-  calM = TODAY.getMonth();
-  selectedDate     = null;
-  selectedTime     = null;
-  selectedDuration = null;
-  $('toStep2').disabled = true;
-  $('toStep3').disabled = true;
+// Progress bar order (step4 is outside the bar — all items go "done" / none "active")
+const STEP_ORDER = ['step1', 'step2', 'step_model', 'step3'];
+const PS_MAP     = { step1: 'ps1', step2: 'ps2', step_model: 'ps_model', step3: 'ps3' };
 
-  // Reset slot + duration UI
-  document.querySelectorAll('.tslot').forEach(t => {
-    t.classList.remove('sel', 'tslot--disabled');
-    t.disabled = false;
+function goStep(stepId) {
+  ALL_STEP_IDS.forEach(id => {
+    const el = $(id);
+    if (el) el.classList.toggle('active', id === stepId);
   });
-  document.querySelectorAll('.dslot').forEach(b => b.classList.remove('sel'));
-
-  goStep(1);
-  updateCalTitle();
-  buildCal('calGrid', calY, calM, true, null);
+  updateProgressBar(stepId);
 }
 
-function closeModal() {
-  overlay.classList.remove('open');
-  overlay.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
-}
-
-function goStep(n) {
-  steps.forEach((s, i) => s.classList.toggle('active', i + 1 === n));
-  psEls.forEach((p, i) => {
-    p.classList.toggle('active', i + 1 === n);
-    p.classList.toggle('done',   i + 1 <  n);
+function updateProgressBar(stepId) {
+  const currentIdx = STEP_ORDER.indexOf(stepId);
+  STEP_ORDER.forEach((id, i) => {
+    const el = $(PS_MAP[id]);
+    if (!el) return;
+    el.classList.remove('active', 'done');
+    if (i === currentIdx)      el.classList.add('active');
+    else if (i < currentIdx)   el.classList.add('done');
   });
 }
 
@@ -309,44 +302,183 @@ function updateCalTitle() {
   if (el) el.textContent = `${MONTHS_FR[calM]} ${calY}`;
 }
 
+/* ─────────────────────────────
+   OPEN MODAL — model CTA path
+   Pre-selects the jet ski; 3-step flow (Date → Heure → Infos).
+───────────────────────────── */
+function openModal(idx) {
+  bookingFromAvail = false;
+  selectedJetSki   = MODELS[idx].dbName;
+
+  $('modalModelName').textContent = MODELS[idx].name;
+  document.getElementById('modal').classList.remove('modal--avail');
+
+  calY = TODAY.getFullYear();
+  calM = TODAY.getMonth();
+  selectedDate     = null;
+  selectedTime     = null;
+  selectedDuration = null;
+  $('toStep2').disabled = true;
+  $('toStep3').disabled = true;
+
+  document.querySelectorAll('.tslot').forEach(t => {
+    t.classList.remove('sel', 'tslot--disabled');
+    t.disabled = false;
+  });
+  document.querySelectorAll('.dslot').forEach(b => b.classList.remove('sel'));
+
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  goStep('step1');
+  updateCalTitle();
+  buildCal('calGrid', calY, calM, true, null);
+}
+
+/* ─────────────────────────────
+   OPEN MODAL — avail calendar path
+   Date is already known; 4-step flow (Date → Heure → Modèle → Infos).
+───────────────────────────── */
+function openModalFromAvail(dateStr) {
+  bookingFromAvail = true;
+  selectedJetSki   = null;
+  selectedDate     = dateStr;
+
+  // Show the month of the clicked date
+  const parts = dateStr.split('-');
+  calY = +parts[0];
+  calM = +parts[1] - 1;
+
+  $('modalModelName').textContent = 'Tous modèles';
+  document.getElementById('modal').classList.add('modal--avail');
+
+  selectedTime     = null;
+  selectedDuration = null;
+  $('toStep3').disabled = true;
+
+  document.querySelectorAll('.tslot').forEach(t => {
+    t.classList.remove('sel', 'tslot--disabled');
+    t.disabled = false;
+  });
+  document.querySelectorAll('.dslot').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.mslot').forEach(s => s.classList.remove('sel'));
+  $('toStep3FromModel').disabled = true;
+
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  updateCalTitle();
+  buildCal('calGrid', calY, calM, true, selectedDate);
+  $('toStep2').disabled = false; // date already chosen
+
+  goStep('step1');
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  document.getElementById('modal').classList.remove('modal--avail');
+  bookingFromAvail = false;
+}
+
+/* ─────────────────────────────
+   MODAL — EVENT LISTENERS
+───────────────────────────── */
 $('modalClose').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 $('calPrev').addEventListener('click', () => {
   calM--; if (calM < 0) { calM = 11; calY--; }
-  selectedDate = null; $('toStep2').disabled = true;
-  updateCalTitle(); buildCal('calGrid', calY, calM, true, null);
+  // In the non-avail path, navigating clears the date selection.
+  // In the avail path, the pre-selected date stays (may be in a different month — that's fine).
+  if (!bookingFromAvail) { selectedDate = null; $('toStep2').disabled = true; }
+  updateCalTitle(); buildCal('calGrid', calY, calM, true, selectedDate);
 });
 
 $('calNext').addEventListener('click', () => {
   calM++; if (calM > 11) { calM = 0; calY++; }
-  selectedDate = null; $('toStep2').disabled = true;
-  updateCalTitle(); buildCal('calGrid', calY, calM, true, null);
+  if (!bookingFromAvail) { selectedDate = null; $('toStep2').disabled = true; }
+  updateCalTitle(); buildCal('calGrid', calY, calM, true, selectedDate);
 });
 
+// Step 1 → Step 2
 $('toStep2').addEventListener('click', () => {
   if (!selectedDate) return;
   const d = new Date(selectedDate + 'T12:00:00');
   $('step2Date').textContent = d.toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   }).replace(/^\w/, c => c.toUpperCase());
-  goStep(2);
-  renderTimeSlots(); // apply real availability to slots
+  goStep('step2');
+  renderTimeSlots();
 });
 
+// Step 2 → Step 3 (model path) or Step 2 → Step_model (avail path)
 $('toStep3').addEventListener('click', () => {
-  const m   = MODELS[bookingModel];
+  if (bookingFromAvail) {
+    goStep('step_model');
+  } else {
+    buildRecap();
+    goStep('step3');
+  }
+});
+
+/* ─────────────────────────────
+   MODEL SELECTOR (step_model — avail path only)
+───────────────────────────── */
+document.querySelectorAll('.mslot').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = +btn.dataset.modelIdx;
+    selectedJetSki = MODELS[idx].dbName;
+    document.querySelectorAll('.mslot').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    $('toStep3FromModel').disabled = false;
+  });
+});
+
+// Step_model → Step 3
+$('toStep3FromModel').addEventListener('click', () => {
+  if (!selectedJetSki) return;
+  buildRecap();
+  goStep('step3');
+});
+
+/* ─────────────────────────────
+   BACK BUTTONS
+───────────────────────────── */
+$('back1').addEventListener('click', () => goStep('step1'));
+
+// Step 3 → Step_model (avail) or Step 2 (model path)
+$('back2').addEventListener('click', () => {
+  if (bookingFromAvail) {
+    goStep('step_model');
+  } else {
+    goStep('step2');
+    renderTimeSlots();
+  }
+});
+
+// Step_model → Step 2
+$('back_model').addEventListener('click', () => {
+  goStep('step2');
+  renderTimeSlots();
+});
+
+/* ─────────────────────────────
+   RECAP
+───────────────────────────── */
+function buildRecap() {
   const d   = new Date(selectedDate + 'T12:00:00');
   const ds  = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   const dur = selectedDuration === 4 ? 'Demi-journée (4h)' : `${selectedDuration}h`;
+  const m   = MODELS.find(x => x.dbName === selectedJetSki);
+  const modelLabel = m ? `${m.name} — ${m.price}/h` : 'Au choix';
   $('recap').innerHTML =
-    `<strong>${m.name}</strong><br>${ds} à ${selectedTime} · ${dur} — ${m.price}/h`;
-  goStep(3);
-});
-
-$('back1').addEventListener('click', () => goStep(1));
-$('back2').addEventListener('click', () => { goStep(2); renderTimeSlots(); });
+    `<strong>${modelLabel}</strong><br>${ds} à ${selectedTime} · ${dur}`;
+}
 
 /* ─────────────────────────────
    FORM SUBMISSION
@@ -387,23 +519,26 @@ $('submitBtn').addEventListener('click', async function () {
 
     if (rpcErr || !clientId) throw new Error(rpcErr?.message ?? 'Erreur lors de la création du client');
 
-    // Insert pending reservation — jet ski assigned later by staff in CRM
+    // Insert pending reservation.
+    // requested_jet_ski: the model the user selected (or null for staff to assign freely).
+    // jet_ski_id stays null — staff assigns the physical unit in the CRM.
     const { error: resErr } = await sb.from('reservations').insert({
-      client_id:        clientId,
-      jet_ski_id:       null,
-      date:             selectedDate,
-      slot_time:        selectedTime,
-      duration_hours:   selectedDuration,
-      nb_persons:       1,
-      source:           'online',
-      status:           'pending',
-      license_verified: 'not_verified',
-      client_message:   msg || null,
+      client_id:         clientId,
+      jet_ski_id:        null,
+      date:              selectedDate,
+      slot_time:         selectedTime,
+      duration_hours:    selectedDuration,
+      nb_persons:        1,
+      source:            'online',
+      status:            'pending',
+      license_verified:  'not_verified',
+      client_message:    msg || null,
+      requested_jet_ski: selectedJetSki,
     });
 
     if (resErr) throw new Error(resErr.message);
 
-    goStep(4);
+    goStep('step4');
 
   } catch (err) {
     console.error('[booking]', err);
@@ -430,6 +565,7 @@ $('doneBtn').addEventListener('click', () => {
 
 /* ─────────────────────────────
    AVAILABILITY CALENDAR (section)
+   Interactive: clicking an available day opens the booking modal.
 ───────────────────────────── */
 function updateAvailTitle() {
   const el = $('availTitle');
@@ -438,7 +574,7 @@ function updateAvailTitle() {
 
 function renderAvail() {
   updateAvailTitle();
-  buildCal('availGrid', availY, availM, false, null);
+  buildCal('availGrid', availY, availM, true, null, openModalFromAvail);
 }
 
 $('availPrev').addEventListener('click', () => {
@@ -496,7 +632,7 @@ mobMenu.style.display = 'none';
 
 async function init() {
   try {
-    await fetchJetSkiIds();
+    await fetchJetSkis();
     await fetchBlocked();
   } catch (e) {
     // If Supabase is unreachable, render calendars with no blocks

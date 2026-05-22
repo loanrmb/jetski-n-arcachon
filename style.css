@@ -507,3 +507,43 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .dslot:hover            { border-color: var(--blue); color: var(--blue); background: var(--blue-ltr); }
 .dslot.sel              { background: var(--blue); border-color: var(--blue); color: var(--white); }
 .dslot.sel em           { color: rgba(255,255,255,0.65); }
+
+/* ════════════════════════════════
+   MODEL SELECTOR (step_model — avail path)
+════════════════════════════════ */
+
+/* Progress bar 4th item — hidden unless in avail path */
+.ps-model-only { display: none; }
+.modal--avail .ps-model-only { display: inline-flex; }
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mslot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r12);
+  background: var(--white);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--t) var(--ease);
+  text-align: center;
+}
+.mslot-name  { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.mslot-level { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+.mslot-price { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-top: 4px; }
+.mslot-price em { font-style: normal; font-size: 0.72em; font-weight: 400; opacity: 0.75; }
+.mslot:hover { border-color: var(--blue); background: var(--blue-ltr); }
+.mslot.sel   { background: var(--blue); border-color: var(--blue); }
+.mslot.sel .mslot-name,
+.mslot.sel .mslot-level,
+.mslot.sel .mslot-price { color: var(--white); }
+.mslot.sel .mslot-price em { opacity: 0.65; }
