@@ -545,7 +545,6 @@ $('submitBtn').addEventListener('click', async function () {
       client_message:    msg || null,
       requested_jet_ski: selectedJetSki,
     };
-    console.log('[booking] reservation payload:', reservationPayload);
     const { error: resErr } = await sb.from('reservations').insert(reservationPayload);
 
     if (resErr) throw new Error(resErr.message);
