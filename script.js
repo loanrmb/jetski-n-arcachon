@@ -1057,65 +1057,97 @@ setTimeout(() => {
 
 /* ─────────────────────────────
    CAROUSEL — Expérience & Sécurité
-   Auto-advance · arrows · dots · keyboard · swipe
+   Infinite loop (ghost clones) · auto-advance · arrows ·
+   dots · keyboard · swipe · speed ramp
 ───────────────────────────── */
 (function () {
   const viewport = document.getElementById('carouselViewport');
   const track    = document.getElementById('carouselTrack');
   if (!track) return;
 
-  const slides = Array.from(track.querySelectorAll('.carousel-slide'));
-  const dots   = Array.from(document.querySelectorAll('#carouselDots .carousel-dot'));
-  const prev   = document.getElementById('carouselPrev');
-  const next   = document.getElementById('carouselNext');
-  const TOTAL  = slides.length;
-  const GAP    = 20; // must match CSS gap on .carousel-track
-  let current  = 0;
-  let autoTimer = null;
+  // Capture real slides BEFORE cloning
+  const realSlides = Array.from(track.querySelectorAll('.carousel-slide'));
+  const dots       = Array.from(document.querySelectorAll('#carouselDots .carousel-dot'));
+  const prevBtn    = document.getElementById('carouselPrev');
+  const nextBtn    = document.getElementById('carouselNext');
+  const TOTAL      = realSlides.length;   // 6
+  const GAP        = 20;                  // must match CSS gap
+  let cur          = 1;                   // index in extended track (1 = slide 0)
+  let autoTimer    = null;
 
-  /* Center slide idx inside the viewport */
+  /* ── Infinite loop: clone first and last slides ── */
+  const cloneLast  = realSlides[TOTAL - 1].cloneNode(true);
+  const cloneFirst = realSlides[0].cloneNode(true);
+  [cloneLast, cloneFirst].forEach(c => c.setAttribute('aria-hidden', 'true'));
+  track.insertBefore(cloneLast,  track.firstChild); // slot 0
+  track.appendChild(cloneFirst);                    // slot TOTAL + 1
+  // Extended track: [cloneLast | s0 s1 … s5 | cloneFirst]  (8 items)
+  const all = Array.from(track.children);
+
+  function slideW() { return all[0].offsetWidth; }
+
   function getOffset(idx) {
-    const vw     = viewport.offsetWidth;
-    const slideW = slides[0].offsetWidth;
-    return (vw - slideW) / 2 - idx * (slideW + GAP);
+    const vw = viewport.offsetWidth;
+    return (vw - slideW()) / 2 - idx * (slideW() + GAP);
   }
 
-  function go(idx, immediate) {
-    current = ((idx % TOTAL) + TOTAL) % TOTAL;
+  /* Real dot index for any extended-track index */
+  function dotIdx(idx) { return ((idx - 1) % TOTAL + TOTAL) % TOTAL; }
 
-    if (immediate) track.classList.add('no-transition');
-    track.style.transform = `translateX(${getOffset(current)}px)`;
-    if (immediate) requestAnimationFrame(() => track.classList.remove('no-transition'));
-
-    slides.forEach((s, i) => s.classList.toggle('cs-active', i === current));
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  function applyClasses(idx) {
+    all.forEach((s, i)  => s.classList.toggle('cs-active', i === idx));
+    dots.forEach((d, i) => d.classList.toggle('active', i === dotIdx(idx)));
   }
 
-  function startAuto() {
-    stopAuto();
-    autoTimer = setInterval(() => go(current + 1), 5000);
-  }
-  function stopAuto() {
-    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  /* Instant position — no transition */
+  function snap(idx) {
+    track.classList.add('no-transition');
+    track.style.transform = `translateX(${getOffset(idx)}px)`;
+    cur = idx;
+    applyClasses(idx);
+    // Double RAF: first paints the snap, second re-enables transitions
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+      track.classList.remove('no-transition')
+    ));
   }
 
-  /* Init — snap to position 0 without animating */
-  go(0, true);
+  /* Animated move */
+  function go(idx) {
+    track.style.transform = `translateX(${getOffset(idx)}px)`;
+    cur = idx;
+    applyClasses(idx);
+  }
+
+  /* After animated slide ends, jump if on a ghost clone */
+  track.addEventListener('transitionend', e => {
+    if (e.propertyName !== 'transform') return;
+    if (cur === 0)           snap(TOTAL);     // ghost last → real last
+    if (cur === TOTAL + 1)   snap(1);         // ghost first → real first
+  });
+
+  function slideNext() { go(cur + 1); }
+  function slidePrev() { go(cur - 1); }
+
+  function startAuto() { stopAuto(); autoTimer = setInterval(slideNext, 5000); }
+  function stopAuto()  { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+
+  /* Init */
+  snap(1);
   startAuto();
 
   /* Arrows */
-  prev.addEventListener('click', () => { go(current - 1); startAuto(); });
-  next.addEventListener('click', () => { go(current + 1); startAuto(); });
+  prevBtn.addEventListener('click', () => { slidePrev(); startAuto(); });
+  nextBtn.addEventListener('click', () => { slideNext(); startAuto(); });
 
-  /* Dots */
+  /* Dots — dot i maps to extended-track slot i + 1 */
   dots.forEach(d =>
-    d.addEventListener('click', () => { go(+d.dataset.dot); startAuto(); })
+    d.addEventListener('click', () => { go(+d.dataset.dot + 1); startAuto(); })
   );
 
   /* Keyboard */
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  { go(current - 1); startAuto(); }
-    if (e.key === 'ArrowRight') { go(current + 1); startAuto(); }
+    if (e.key === 'ArrowLeft')  { slidePrev(); startAuto(); }
+    if (e.key === 'ArrowRight') { slideNext(); startAuto(); }
   });
 
   /* Pause on hover */
@@ -1123,23 +1155,39 @@ setTimeout(() => {
   viewport.addEventListener('mouseleave', startAuto);
 
   /* Touch / swipe */
-  let touchStartX = 0;
+  let touchX = 0;
   viewport.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
+    touchX = e.touches[0].clientX;
   }, { passive: true });
   viewport.addEventListener('touchend', e => {
-    const delta = touchStartX - e.changedTouches[0].clientX;
+    const delta = touchX - e.changedTouches[0].clientX;
     if (Math.abs(delta) > 40) {
-      go(delta > 0 ? current + 1 : current - 1);
+      delta > 0 ? slideNext() : slidePrev();
       startAuto();
     }
   }, { passive: true });
 
-  /* Recalculate on resize */
+  /* Resize — recalculate position without animation */
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => go(current, true), 100);
+    resizeTimer = setTimeout(() => snap(cur), 100);
   }, { passive: true });
+}());
+
+/* ─────────────────────────────
+   PRICING HEADING — device-aware copy
+───────────────────────────── */
+(function () {
+  const heading  = document.getElementById('pricingHeading');
+  const eyebrow  = document.getElementById('pricingEyebrow');
+  if (!heading) return;
+  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (isMobile) {
+    heading.textContent = 'Posez votre téléphone. Venez prendre le guidon.';
+  } else {
+    heading.textContent = 'Fermez votre ordinateur. Venez prendre le guidon.';
+    if (eyebrow) eyebrow.style.display = 'none'; // label not needed on desktop
+  }
 }());
 
