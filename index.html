@@ -255,6 +255,41 @@
   </div>
 </section>
 
+<!-- MÉTÉO EN DIRECT -->
+<section class="weather-section" id="meteo">
+  <div class="container">
+    <p class="eyebrow">Conditions actuelles</p>
+    <h2>Météo Arcachon</h2>
+    <div class="weather-card reveal">
+      <div class="weather-inner">
+        <div class="weather-icon-wrap" id="weatherIcon">
+          <!-- icône injectée par JS -->
+        </div>
+        <div class="weather-data">
+          <div class="weather-stat">
+            <div class="weather-val-wrap">
+              <span class="weather-val" id="weatherTemp">--</span><span class="weather-unit">°C</span>
+            </div>
+            <span class="weather-label">Température</span>
+          </div>
+          <div class="weather-sep"></div>
+          <div class="weather-stat">
+            <div class="weather-val-wrap">
+              <span class="weather-val" id="weatherWind">--</span><span class="weather-unit"> kn</span>
+            </div>
+            <span class="weather-label">Vent</span>
+          </div>
+        </div>
+        <div class="weather-badge" id="weatherBadge">
+          <span class="weather-badge-dot"></span>
+          <span id="weatherLabel">Chargement…</span>
+        </div>
+      </div>
+      <p class="weather-source">Météo en direct · Arcachon · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
+    </div>
+  </div>
+</section>
+
 <!-- INCLUDES -->
 <section class="includes">
   <div class="container">
