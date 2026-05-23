@@ -707,6 +707,33 @@ async function init() {
 init();
 
 /* ─────────────────────────────
+   STAGGER RAF — timestamp-based, 160Hz-safe
+   Reveals elements[0..n] one-by-one, spaced msPerStep ms apart,
+   calling onReveal(el, idx) for each. Uses a single rAF loop
+   rather than nested setTimeouts so it stays in sync with the
+   display refresh rate.
+───────────────────────────── */
+function staggerRAF(elements, msPerStep, onReveal) {
+  if (!elements.length) return;
+  const start = performance.now();
+  let lastIdx = -1;
+  function step(now) {
+    const idx = Math.min(
+      Math.floor((now - start) / msPerStep),
+      elements.length - 1
+    );
+    for (let i = lastIdx + 1; i <= idx; i++) {
+      onReveal(elements[i], i);
+    }
+    lastIdx = idx;
+    if (lastIdx < elements.length - 1) {
+      requestAnimationFrame(step);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+/* ─────────────────────────────
    SCROLL REVEAL — Intersection Observer
 ───────────────────────────── */
 (function () {
@@ -728,18 +755,16 @@ init();
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   revealEls.forEach(el => revealObs.observe(el));
 
-  // Staggered inc-cards
-  const incCards = document.querySelectorAll('.inc-card');
+  // Staggered inc-cards — RAF-based stagger for 160Hz smoothness
+  const incCards = Array.from(document.querySelectorAll('.inc-card'));
+  let incRevealPending = false;
   const incObs = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        const idx = Array.from(incCards).indexOf(e.target);
-        setTimeout(() => {
-          e.target.classList.add('visible');
-        }, idx * 80);
-        incObs.unobserve(e.target);
-      }
-    });
+    if (incRevealPending) return;
+    if (entries.some(e => e.isIntersecting)) {
+      incRevealPending = true;
+      staggerRAF(incCards, 80, el => el.classList.add('visible'));
+      incObs.disconnect();
+    }
   }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
   incCards.forEach(el => incObs.observe(el));
 
@@ -782,9 +807,7 @@ init();
       entries.forEach(e => {
         if (e.isIntersecting && !ptFlipDone) {
           ptFlipDone = true;
-          ptFlipCells.forEach((el, i) => {
-            setTimeout(() => el.classList.add('visible'), i * 80);
-          });
+          staggerRAF(ptFlipCells, 80, el => el.classList.add('visible'));
           ptFlipObs.disconnect();
         }
       });
@@ -797,9 +820,11 @@ init();
    HERO TEXT — entrance sequence
 ───────────────────────────── */
 setTimeout(() => {
-  document.querySelectorAll('.intro-hero-el').forEach((el, i) => {
-    setTimeout(() => el.classList.add('visible'), i * 150);
-  });
+  staggerRAF(
+    Array.from(document.querySelectorAll('.intro-hero-el')),
+    150,
+    el => el.classList.add('visible')
+  );
 }, 200);
 
 /* ─────────────────────────────

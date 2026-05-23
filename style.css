@@ -28,7 +28,10 @@
   --t: 0.2s;
 }
 
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html { -webkit-font-smoothing: antialiased; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -37,6 +40,7 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
@@ -133,7 +137,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .mt-tab.active { background: var(--white); color: var(--text); font-weight: 600; box-shadow: 0 1px 8px rgba(0,0,0,0.13); }
 
 .mt-stage { position: relative; width: 100%; overflow: hidden; }
-.mt-slide { display: none; flex-direction: column; width: 100%; }
+.mt-slide { display: none; flex-direction: column; width: 100%; will-change: transform; }
 .mt-slide.active { display: flex; }
 .mt-slide.is-entering,
 .mt-slide.is-leaving {
@@ -555,27 +559,29 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 /* Scroll reveal */
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translate3d(0, 32px, 0);
   transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+  will-change: transform;
 }
 .reveal--right {
-  transform: translateX(32px) translateY(0px);
+  transform: translate3d(32px, 0, 0);
 }
 .reveal.visible {
   opacity: 1;
-  transform: none;
+  transform: translate3d(0, 0, 0);
 }
 
 /* Staggered reveal for grids */
-.inc-card { opacity: 0; transform: translateY(28px) scale(0.97); transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s var(--ease); }
-.inc-card.visible { opacity: 1; transform: none; }
-.inc-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 16px 40px rgba(0,113,227,0.10), 0 4px 16px rgba(0,0,0,0.06); }
+.inc-card { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.97); transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s var(--ease); will-change: transform; }
+.inc-card.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+.inc-card:hover { transform: translate3d(0, -5px, 0) scale(1.01); box-shadow: 0 16px 40px rgba(0,113,227,0.10), 0 4px 16px rgba(0,0,0,0.06); }
 
 /* Nav — glass effect */
 .nav {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   background: rgba(255,255,255,0.82) !important;
+  transform: translateZ(0);
   transition: box-shadow 0.3s var(--ease), background 0.3s var(--ease);
 }
 .nav.scrolled {
@@ -619,11 +625,13 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   border-radius: 24px;
   padding: 28px 32px 32px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.8) inset;
+  transform: translateZ(0);
+  will-change: transform;
   transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
 }
 .avail-card:hover {
   box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
-  transform: translateY(-2px);
+  transform: translate3d(0, -2px, 0);
 }
 
 .avail-legend { display: flex; gap: 22px; margin: 20px 0 0; flex-wrap: wrap; }
@@ -697,6 +705,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   align-items: center;
   gap: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  transform: translateZ(0);
 }
 .map-badge-icon {
   width: 34px; height: 34px;
@@ -727,9 +736,10 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 ════════════════════════════════ */
 .btn {
   transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s var(--ease), background 0.18s var(--ease) !important;
+  will-change: transform;
 }
 .btn:hover {
-  transform: scale(1.03) translateY(-1px);
+  transform: scale(1.03) translate3d(0, -1px, 0);
   box-shadow: 0 8px 24px rgba(0,113,227,0.28) !important;
 }
 .btn:active {
@@ -739,23 +749,23 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 
 /* btn-reserve spring */
 .btn-reserve:hover {
-  transform: scale(1.04) translateY(-1px);
+  transform: scale(1.04) translate3d(0, -1px, 0);
   box-shadow: 0 10px 32px rgba(0,113,227,0.35) !important;
 }
 
 /* ════════════════════════════════
    GALLERY BLOCKS — reveal
 ════════════════════════════════ */
-.gblock { opacity: 0; transform: translateY(24px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); }
-.gblock.visible { opacity: 1; transform: none; }
+.gblock { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+.gblock.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
 /* ════════════════════════════════
    LOC SECTION — glass info card
 ════════════════════════════════ */
-.loc-info { opacity: 0; transform: translateX(-24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
-.loc-info.visible { opacity: 1; transform: none; }
-.loc-map { opacity: 0; transform: translateX(24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s; }
-.loc-map.visible { opacity: 1; transform: none; }
+.loc-info { opacity: 0; transform: translate3d(-24px, 0, 0); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+.loc-info.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+.loc-map { opacity: 0; transform: translate3d(24px, 0, 0); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s; will-change: transform; }
+.loc-map.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
 /* ════════════════════════════════
    PRICING TABLE — airport flip reveal
@@ -766,6 +776,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   transform-origin: top center;
   transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
   backface-visibility: hidden;
+  will-change: transform;
 }
 .pt-row:not(.pt-head) .pt-c:not(.pt-c--name).visible {
   opacity: 1;
@@ -777,10 +788,11 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 ════════════════════════════════ */
 .intro-hero-el {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translate3d(0, 20px, 0);
   transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1);
+  will-change: transform;
 }
-.intro-hero-el.visible { opacity: 1; transform: none; }
+.intro-hero-el.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
 /* ════════════════════════════════
    MÉTÉO — section live Arcachon
@@ -801,11 +813,13 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   border-radius: 24px;
   padding: 28px 36px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.8) inset;
+  transform: translateZ(0);
+  will-change: transform;
   transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
 }
 .weather-card:hover {
   box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
-  transform: translateY(-2px);
+  transform: translate3d(0, -2px, 0);
 }
 .weather-inner {
   display: flex;
@@ -999,7 +1013,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 @media (max-width: 860px) {
   .avail-layout { grid-template-columns: 1fr; gap: 36px; }
   .avail-text .sec-sub { max-width: 100%; }
-  .reveal--right { transform: translateY(32px); }
+  .reveal--right { transform: translate3d(0, 32px, 0); }
 }
 @media (max-width: 600px) {
   .avail-card { padding: 20px 16px; }
