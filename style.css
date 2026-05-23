@@ -502,11 +502,11 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .rotating-phrase {
   display: inline-block;
   position: relative;
-  background: linear-gradient(135deg, #38bdf8, #0ea5e9, #6366f1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #0ea5e9;
+  -webkit-text-fill-color: #0ea5e9;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
   padding: 2px 14px 4px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -1362,10 +1362,33 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .loc-contact-item { min-height: 44px; }
   .carousel-dot { padding: 8px; }
 
-  /* ── Bento: image fit on mobile ── */
-  .bento-card { min-height: 200px; max-height: 240px; }
-  .bento-img { object-fit: cover; object-position: center; width: 100%; height: 100%; }
-  .bento-card--gilet .bento-img { object-fit: contain; width: calc(100% - 24px); height: calc(100% - 24px); }
+  /* ── Bento: fixed height for consistency ── */
+  .inc-card { height: 260px; min-height: unset; }
+
+  /* Product shots — contain with breathing room */
+  .bento-card--gilet .bento-img,
+  .bento-card--shorty .bento-img {
+    object-fit: contain;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  /* Reset gilet's desktop abs-centering so padding handles spacing cleanly */
+  .bento-card--gilet .bento-img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
+
+  /* Context photos — cover */
+  .bento-card--carte .bento-img,
+  .bento-card--briefing .bento-img,
+  .bento-card--sac .bento-img {
+    object-fit: cover;
+    object-position: center;
+    padding: 0;
+  }
 }
 
 /* ════════════════════════════════
@@ -1406,8 +1429,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   }
   .bento-card           { min-height: 200px; }
   .bento-card--assurance { min-height: 130px; flex-direction: row; }
-  .bento-img { object-fit: cover; object-position: center; width: 100%; height: 100%; }
-  .bento-card--gilet .bento-img { object-fit: contain; width: calc(100% - 24px); height: calc(100% - 24px); }
 
   /* ── Pricing: even more compact ── */
   .price-table { min-width: 440px; }
