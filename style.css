@@ -428,11 +428,14 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   background-color: #3ecf60;
 }
 .bento-card--gilet .bento-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
   object-fit: contain;
   object-position: center center;
-  inset: 16px;
-  width: auto;
-  height: auto;
 }
 
 /* ── Emoji cards ── */

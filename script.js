@@ -201,6 +201,25 @@ mtTabs.forEach(tab => {
 });
 
 /* ─────────────────────────────
+   MODEL STAGE — Mac trackpad two-finger swipe
+───────────────────────────── */
+(function () {
+  if (!mtStage) return;
+  let wheelCooling = false;
+  mtStage.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    if (wheelCooling || mtIsAnimating) return;
+    wheelCooling = true;
+    setTimeout(() => { wheelCooling = false; }, 500);
+    const dir    = e.deltaX > 40 ? 1 : e.deltaX < -40 ? -1 : 0;
+    if (dir === 0) return;
+    const newIdx = Math.max(0, Math.min(mtTabs.length - 1, currentModel + dir));
+    if (newIdx !== currentModel) mtTabs[newIdx].click();
+  }, { passive: false });
+})();
+
+/* ─────────────────────────────
    RESERVE BUTTONS (model CTA)
    Each .btn-reserve has data-model="0|1|2" matching MODELS index.
 ───────────────────────────── */
@@ -1166,6 +1185,18 @@ setTimeout(() => {
       startAuto();
     }
   }, { passive: true });
+
+  /* Mac trackpad two-finger horizontal swipe */
+  let wheelCooling = false;
+  viewport.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // ignore vertical scroll
+    e.preventDefault();
+    if (wheelCooling) return;
+    wheelCooling = true;
+    setTimeout(() => { wheelCooling = false; }, 500);
+    if (e.deltaX > 40)       { slideNext(); startAuto(); }
+    else if (e.deltaX < -40) { slidePrev(); startAuto(); }
+  }, { passive: false });
 
   /* Resize — recalculate position without animation */
   let resizeTimer;
