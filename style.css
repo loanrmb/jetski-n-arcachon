@@ -452,9 +452,9 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   margin: 0;
 }
 
-/* ── Assurance — dark accent, horizontal layout ── */
+/* ── Assurance — sky-blue accent, horizontal layout ── */
 .bento-card--assurance {
-  background: var(--text);
+  background: #5fc9f8;
   flex-direction: row;
   align-items: center;
   gap: 22px;
@@ -462,8 +462,8 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 }
 
 .bento-card--assurance .bento-emoji-lg { font-size: 44px; flex-shrink: 0; }
-.bento-card--assurance .bento-title    { color: var(--white); }
-.bento-card--assurance .bento-sub      { color: rgba(255,255,255,0.45); }
+.bento-card--assurance .bento-title    { color: #1d1d1f; }
+.bento-card--assurance .bento-sub      { color: rgba(29,29,31,0.55); }
 
 /* ════════════════════════════════
    PRICING
