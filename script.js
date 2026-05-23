@@ -1006,7 +1006,7 @@ setTimeout(() => {
       const code = c.weathercode;
 
       // ① Conditions actuelles
-      document.getElementById('weatherIcon').innerHTML = buildSvg(code, 'weather-icon');
+      document.getElementById('weatherIcon').innerHTML = '<span style="font-size:56px;line-height:1">' + emojiForCode(code) + '</span>';
       document.getElementById('weatherTemp').textContent = temp;
       document.getElementById('weatherWind').textContent = wind;
 
