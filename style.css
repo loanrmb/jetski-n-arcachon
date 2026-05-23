@@ -544,10 +544,10 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 
 .carousel-slide {
   flex: 0 0 auto;
-  width: 76vw;
+  width: 58vw;
   border-radius: 24px;
   overflow: hidden;
-  transform: scale(0.88);
+  transform: scale(0.82);
   filter: blur(2px);
   opacity: 0.5;
   transition:
@@ -596,8 +596,8 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   transform: translateY(-50%) scale(1.07);
 }
 /* Sit right at the active card edges (12% inset = (100-76)/2) */
-.carousel-arrow--prev { left:  calc(12vw - 22px); }
-.carousel-arrow--next { right: calc(12vw - 22px); }
+.carousel-arrow--prev { left:  calc(21vw - 22px); }
+.carousel-arrow--next { right: calc(21vw - 22px); }
 
 /* Dots */
 .carousel-dots {
@@ -715,7 +715,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .pt-row  { grid-template-columns: 130px 1fr 1fr 1fr; }
   .mt-img  { height: 280px; padding: 24px 32px 0; }
   /* Carousel — tablet */
-  .carousel-slide { width: 84vw; }
+  .carousel-slide { width: 72vw; }
   .carousel-arrow--prev { left: 8px; }
   .carousel-arrow--next { right: 8px; }
   /* Bento — 2 colonnes */
