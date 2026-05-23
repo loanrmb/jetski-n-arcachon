@@ -395,9 +395,9 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   margin: 0;
 }
 
-/* Shorty — light background to contrast the dark wetsuit */
+/* Shorty — orange matching the product image background */
 .bento-card--shorty {
-  background: #e8e8ed;
+  background-color: #f97316;
 }
 .bento-card--shorty .bento-img {
   object-position: center top;
@@ -1363,7 +1363,10 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .carousel-dot { padding: 8px; }
 
   /* ── Bento: fixed height for consistency ── */
-  .inc-card { height: 260px; min-height: unset; }
+  .inc-card              { height: 260px; min-height: unset; }
+  .bento-card--shorty    { height: 320px; }
+  .bento-card--gilet     { height: 320px; }
+  .bento-card--assurance { height: 160px; }
 
   /* Product shots — contain with breathing room */
   .bento-card--gilet .bento-img,
