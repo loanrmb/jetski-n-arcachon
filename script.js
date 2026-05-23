@@ -1150,11 +1150,24 @@ setTimeout(() => {
   function startAuto() { stopAuto(); autoTimer = setInterval(slideNext, 5000); }
   function stopAuto()  { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
 
-  /* Init — defer to next paint so layout is fully measured before snap() */
-  requestAnimationFrame(() => {
-    snap(1);
-    startAuto();
+  /* Init — wait for full page load so images are sized and layout is stable */
+  window.addEventListener('load', () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        snap(1);
+        startAuto();
+      });
+    });
   });
+
+  /* Safety net: if the active slide is still transparent 300ms after load,
+     re-snap to force correct opacity (catches slow-load edge cases) */
+  setTimeout(() => {
+    const active = track.querySelector('.cs-active');
+    if (active && parseFloat(getComputedStyle(active).opacity) < 0.5) {
+      snap(cur);
+    }
+  }, 300);
 
   /* Arrows */
   prevBtn.addEventListener('click', () => { slidePrev(); startAuto(); });
