@@ -16,9 +16,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    CONSTANTS
 ───────────────────────────── */
 const MODELS = [
-  { name: 'Sea-Doo GTI SE 130', dbName: 'GTI SE 130', price: '110 €', prices: { 1: '110 €', 2: '195 €', 4: '360 €' } },
-  { name: 'Sea-Doo GTX 230',    dbName: 'GTX 230',    price: '125 €', prices: { 1: '125 €', 2: '220 €', 4: '395 €' } },
-  { name: 'Sea-Doo RXT-X 300',  dbName: 'RXT-X 300',  price: '140 €', prices: { 1: '140 €', 2: '245 €', 4: '430 €' } },
+  { name: 'Sea-Doo GTX 170',        dbName: 'GTX 170',        price: '110 €', prices: { 1: '110 €', 2: '195 €', 4: '360 €' } },
+  { name: 'Sea-Doo GTX Limited 230', dbName: 'GTX Limited 230', price: '125 €', prices: { 1: '125 €', 2: '220 €', 4: '395 €' } },
+  { name: 'Sea-Doo GTX Limited 325', dbName: 'GTX Limited 325', price: '140 €', prices: { 1: '140 €', 2: '245 €', 4: '430 €' } },
 ];
 
 // Must match slot_time values in the DB
