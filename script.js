@@ -40,6 +40,7 @@ const $ = id => document.getElementById(id);
    STATE
 ───────────────────────────── */
 let currentModel     = 0;
+let mtIsAnimating    = false;
 let calY             = TODAY.getFullYear();
 let calM             = TODAY.getMonth();
 let availY           = TODAY.getFullYear();
@@ -138,15 +139,64 @@ const mtSlides = document.querySelectorAll('.mt-slide');
   container.appendChild(inner);
 })();
 
+const mtStage = document.querySelector('.mt-stage');
+
 mtTabs.forEach(tab => {
   tab.addEventListener('click', () => {
     const idx = +tab.dataset.idx;
-    if (idx === currentModel) return;
-    currentModel = idx;
-    mtTabs.forEach(t  => t.classList.remove('active'));
-    mtSlides.forEach(s => s.classList.remove('active'));
+    if (idx === currentModel || mtIsAnimating) return;
+
+    const direction = idx > currentModel ? 1 : -1;
+    const oldSlide  = mtSlides[currentModel];
+    const newSlide  = mtSlides[idx];
+
+    mtIsAnimating = true;
+    currentModel  = idx;
+
+    // Snap active tab
+    mtTabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    mtSlides[idx].classList.add('active');
+
+    // Lock stage height so it doesn't collapse while children are absolute
+    mtStage.style.height = mtStage.offsetHeight + 'px';
+
+    // Old slide: keep its current position, will slide out
+    oldSlide.classList.add('is-leaving');
+    oldSlide.classList.remove('active');
+    oldSlide.style.transform = 'translateX(0)';
+
+    // New slide: position off-screen on the entry side
+    newSlide.classList.add('is-entering');
+    newSlide.style.transform = `translateX(${direction * 100}%)`;
+
+    // Force reflow so initial transforms register before transitions start
+    newSlide.getBoundingClientRect(); // eslint-disable-line no-unused-expressions
+
+    const easing = '380ms cubic-bezier(0.32, 0, 0.18, 1)';
+    oldSlide.style.transition = `transform ${easing}`;
+    oldSlide.style.transform  = `translateX(${-direction * 100}%)`;
+    newSlide.style.transition = `transform ${easing}`;
+    newSlide.style.transform  = 'translateX(0)';
+
+    newSlide.addEventListener('transitionend', function cleanup(e) {
+      if (e.propertyName !== 'transform') return;
+      newSlide.removeEventListener('transitionend', cleanup);
+
+      // Promote new slide to normal flow
+      newSlide.classList.remove('is-entering');
+      newSlide.classList.add('active');
+      newSlide.style.transform  = '';
+      newSlide.style.transition = '';
+
+      // Remove leaving helpers from old slide
+      oldSlide.classList.remove('is-leaving');
+      oldSlide.style.transform  = '';
+      oldSlide.style.transition = '';
+
+      // Restore stage to auto height
+      mtStage.style.height = '';
+      mtIsAnimating = false;
+    });
   });
 });
 
@@ -720,4 +770,26 @@ init();
     locObs.observe(locInfo);
     locObs.observe(locMap);
   }
+
+  // Staggered pricing rows (skip header)
+  const ptRows = document.querySelectorAll('.pt-row:not(.pt-head)');
+  const ptObs  = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = Array.from(ptRows).indexOf(e.target);
+        setTimeout(() => { e.target.classList.add('visible'); }, idx * 100);
+        ptObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -20px 0px' });
+  ptRows.forEach(el => ptObs.observe(el));
 })();
+
+/* ─────────────────────────────
+   HERO TEXT — entrance sequence
+───────────────────────────── */
+setTimeout(() => {
+  document.querySelectorAll('.intro-hero-el').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), i * 150);
+  });
+}, 200);
