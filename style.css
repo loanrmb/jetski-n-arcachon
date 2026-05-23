@@ -268,23 +268,11 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 /* ════════════════════════════════
    AVAILABILITY
 ════════════════════════════════ */
-.avail { background: var(--white); padding: 80px 0; border-bottom: 1px solid var(--border-lt); }
-.avail h2 { margin-bottom: 8px; }
-.avail-legend { display: flex; gap: 22px; margin: 18px 0 24px; flex-wrap: wrap; }
 .al-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text2); }
 .al-dot  { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .al-ok    { background: var(--green); }
 .al-full  { background: #E74C3C; }
 .al-today { background: var(--blue); }
-
-.avail-card {
-  background: var(--white);
-  border: 1px solid var(--border-lt);
-  border-radius: var(--r24);
-  padding: 28px 32px 32px;
-  max-width: 720px;
-  box-shadow: var(--sh1);
-}
 
 /* ════════════════════════════════
    INCLUDES — emoji cards
@@ -555,3 +543,199 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .mslot.sel .mslot-level,
 .mslot.sel .mslot-price { color: var(--white); }
 .mslot.sel .mslot-price em { opacity: 0.65; }
+
+/* ════════════════════════════════
+   LIQUID GLASS / SCROLL REVEAL
+════════════════════════════════ */
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal--right {
+  transform: translateX(32px) translateY(0px);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Staggered reveal for grids */
+.inc-card { opacity: 0; transform: translateY(28px) scale(0.97); transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s var(--ease); }
+.inc-card.visible { opacity: 1; transform: none; }
+.inc-card:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 16px 40px rgba(0,113,227,0.10), 0 4px 16px rgba(0,0,0,0.06); }
+
+/* Nav — glass effect */
+.nav {
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(255,255,255,0.82) !important;
+  transition: box-shadow 0.3s var(--ease), background 0.3s var(--ease);
+}
+.nav.scrolled {
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08), 0 4px 24px rgba(0,0,0,0.05);
+}
+
+/* ════════════════════════════════
+   AVAIL — 2-column layout
+════════════════════════════════ */
+.avail { background: var(--bg); padding: 100px 0; border-bottom: 1px solid var(--border-lt); }
+
+.avail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.avail-text .sec-sub { max-width: 380px; }
+
+.avail-cta-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.83rem;
+  color: var(--text3);
+  margin-top: 4px;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1px solid var(--border-lt);
+  border-radius: var(--r12);
+  width: fit-content;
+}
+.avail-cta-hint svg { width: 16px; height: 16px; color: var(--blue); flex-shrink: 0; }
+
+.avail-card {
+  background: rgba(255,255,255,0.72);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 24px;
+  padding: 28px 32px 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.8) inset;
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.avail-card:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
+  transform: translateY(-2px);
+}
+
+.avail-legend { display: flex; gap: 22px; margin: 20px 0 0; flex-wrap: wrap; }
+
+/* ════════════════════════════════
+   MAP STATIQUE — style iPhone Plans
+════════════════════════════════ */
+.map-static {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  border-radius: var(--r18);
+  overflow: hidden;
+  background: #C8DEFA;
+}
+
+.map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes mapPulse {
+  0%   { r: 10; opacity: 0.5; }
+  50%  { r: 18; opacity: 0.1; }
+  100% { r: 10; opacity: 0.5; }
+}
+.map-pulse { animation: mapPulse 2s ease-in-out infinite; }
+
+.map-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.88);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+.map-badge-icon {
+  width: 34px; height: 34px;
+  background: var(--blue);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; flex-shrink: 0;
+}
+.map-badge-icon svg { width: 16px; height: 16px; }
+.map-badge strong { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.map-badge span    { font-size: 0.75rem; color: var(--text2); }
+
+/* ════════════════════════════════
+   GLASS CARDS — pricing & includes
+════════════════════════════════ */
+.pt-table {
+  background: rgba(255,255,255,0.7);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+}
+
+/* ════════════════════════════════
+   ENHANCED BUTTON ANIMATIONS
+════════════════════════════════ */
+.btn {
+  transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), box-shadow 0.18s var(--ease), background 0.18s var(--ease) !important;
+}
+.btn:hover {
+  transform: scale(1.03) translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0,113,227,0.28) !important;
+}
+.btn:active {
+  transform: scale(0.97);
+  box-shadow: none !important;
+}
+
+/* btn-reserve spring */
+.btn-reserve:hover {
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 10px 32px rgba(0,113,227,0.35) !important;
+}
+
+/* ════════════════════════════════
+   GALLERY BLOCKS — reveal
+════════════════════════════════ */
+.gblock { opacity: 0; transform: translateY(24px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); }
+.gblock.visible { opacity: 1; transform: none; }
+
+/* ════════════════════════════════
+   LOC SECTION — glass info card
+════════════════════════════════ */
+.loc-info { opacity: 0; transform: translateX(-24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+.loc-info.visible { opacity: 1; transform: none; }
+.loc-map { opacity: 0; transform: translateX(24px); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s; }
+.loc-map.visible { opacity: 1; transform: none; }
+
+/* ════════════════════════════════
+   RESPONSIVE — avail layout
+════════════════════════════════ */
+@media (max-width: 860px) {
+  .avail-layout { grid-template-columns: 1fr; gap: 36px; }
+  .avail-text .sec-sub { max-width: 100%; }
+  .reveal--right { transform: translateY(32px); }
+}
+@media (max-width: 600px) {
+  .avail-card { padding: 20px 16px; }
+  .avail { padding: 72px 0; }
+}

@@ -655,3 +655,69 @@ async function init() {
 }
 
 init();
+
+/* ─────────────────────────────
+   SCROLL REVEAL — Intersection Observer
+───────────────────────────── */
+(function () {
+  // Nav glass on scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  // Generic .reveal elements
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // Staggered inc-cards
+  const incCards = document.querySelectorAll('.inc-card');
+  const incObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        const idx = Array.from(incCards).indexOf(e.target);
+        setTimeout(() => {
+          e.target.classList.add('visible');
+        }, idx * 80);
+        incObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
+  incCards.forEach(el => incObs.observe(el));
+
+  // Gallery blocks
+  const gblocks = document.querySelectorAll('.gblock');
+  const gObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        gObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  gblocks.forEach(el => gObs.observe(el));
+
+  // Location section
+  const locInfo = document.querySelector('.loc-info');
+  const locMap  = document.querySelector('.loc-map');
+  if (locInfo && locMap) {
+    const locObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          locObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    locObs.observe(locInfo);
+    locObs.observe(locMap);
+  }
+})();
