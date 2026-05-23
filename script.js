@@ -1150,9 +1150,11 @@ setTimeout(() => {
   function startAuto() { stopAuto(); autoTimer = setInterval(slideNext, 5000); }
   function stopAuto()  { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
 
-  /* Init */
-  snap(1);
-  startAuto();
+  /* Init — defer to next paint so layout is fully measured before snap() */
+  requestAnimationFrame(() => {
+    snap(1);
+    startAuto();
+  });
 
   /* Arrows */
   prevBtn.addEventListener('click', () => { slidePrev(); startAuto(); });
@@ -1207,18 +1209,62 @@ setTimeout(() => {
 }());
 
 /* ─────────────────────────────
-   PRICING HEADING — device-aware copy
+   PRICING HEADING — rotating phrase animation
+   Static line is device-aware; the animated span cycles 5 phrases.
 ───────────────────────────── */
 (function () {
-  const heading  = document.getElementById('pricingHeading');
-  const eyebrow  = document.getElementById('pricingEyebrow');
+  const heading = document.getElementById('pricingHeading');
+  const eyebrow = document.getElementById('pricingEyebrow');
   if (!heading) return;
-  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-  if (isMobile) {
-    heading.textContent = 'Posez votre téléphone. Venez prendre le guidon.';
-  } else {
-    heading.textContent = 'Fermez votre ordinateur. Venez prendre le guidon.';
-    if (eyebrow) eyebrow.style.display = 'none'; // label not needed on desktop
+
+  const isMobile   = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const staticLine = isMobile ? 'Posez votre téléphone.' : 'Fermez votre ordinateur.';
+  if (!isMobile && eyebrow) eyebrow.style.display = 'none';
+
+  const phrases = [
+    'Venez prendre le guidon.',
+    'Venez vous mouiller.',
+    'Venez toucher le sable.',
+    'Venez visiter le Bassin.',
+    'Venez respirer l’air du large.',
+  ];
+  let idx = 0;
+
+  // Build heading: static first line + animated span on second line
+  heading.innerHTML =
+    staticLine + '<br><span class="rotating-phrase">' + phrases[0] + '</span>';
+  const span = heading.querySelector('.rotating-phrase');
+
+  const HOLD     = 2800; // ms each phrase is held visible
+  const FADE_OUT =  300; // ms fade-to-invisible
+  const FADE_IN  =  400; // ms fade-to-visible
+  const CYCLE    = HOLD + FADE_OUT + FADE_IN;
+
+  function rotate() {
+    // ① Fade out + slide up
+    span.style.transition = `opacity ${FADE_OUT}ms ease, transform ${FADE_OUT}ms ease`;
+    span.style.opacity    = '0';
+    span.style.transform  = 'translateY(-8px)';
+
+    // ② After fade-out: swap text, teleport below, then fade in
+    setTimeout(() => {
+      idx = (idx + 1) % phrases.length;
+      span.textContent      = phrases[idx];
+      span.style.transition = 'none';
+      span.style.opacity    = '0';
+      span.style.transform  = 'translateY(8px)';
+
+      // Force reflow so the instant reset registers before transition re-enables
+      span.getBoundingClientRect(); // eslint-disable-line no-unused-expressions
+
+      requestAnimationFrame(() => {
+        span.style.transition = `opacity ${FADE_IN}ms ease, transform ${FADE_IN}ms ease`;
+        span.style.opacity    = '1';
+        span.style.transform  = 'translateY(0)';
+      });
+    }, FADE_OUT);
   }
+
+  setInterval(rotate, CYCLE);
 }());
 

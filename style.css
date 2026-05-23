@@ -504,6 +504,30 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-size: 0.95rem; font-weight: 500; color: var(--text); align-items: flex-start; justify-content: center; }
 .pt-row:not(.pt-head) .pt-c--hl { font-weight: 700; font-size: 1rem; }
 
+/* ── Rotating phrase in pricing heading ── */
+.rotating-phrase {
+  display: inline-block;
+  position: relative;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 2px 14px 4px;
+  will-change: opacity, transform;
+}
+.rotating-phrase::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(56, 189, 248, 0.10);
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
 /* ════════════════════════════════
    GALLERY
 ════════════════════════════════ */
@@ -520,7 +544,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 /* === CAROUSEL EXPERIENCE === */
 .carousel-section {
   background: #ffffff;
-  padding: 100px 0 80px;
+  padding: 56px 0 80px;
   overflow: hidden; /* clips partial side cards at page edges */
 }
 
@@ -736,7 +760,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .inc-emoji { font-size: 48px; }
   .inc-visual { height: 120px; }
   /* Carousel — mobile: full-width, no side peek effect */
-  .carousel-section { padding: 72px 0 56px; }
+  .carousel-section { padding: 40px 0 56px; }
   .carousel-slide {
     width: 92vw;
     transform: scale(1) !important;
