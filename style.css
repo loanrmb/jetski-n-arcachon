@@ -1333,22 +1333,28 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .mt-tabs-inner { flex-wrap: nowrap; }
   .mt-tab { flex-shrink: 0; }
 
-  /* ── Pricing: wrap scrolls horizontally, CTA expands ── */
+  /* ── Pricing: full-width, no horizontal scroll ── */
   .price-table-scroller {
-    overflow-x: auto;
+    overflow-x: visible;
     border-radius: var(--r18);
-    /* right-edge fade hints there's more content to scroll */
-    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
-    mask-image: linear-gradient(to right, #000 85%, transparent 100%);
   }
-  /* remove inner border-radius so scroller's radius shows cleanly */
   .price-table {
     border-radius: 0;
     margin-top: 0;
-    min-width: 520px;
+    width: 100%;
+    min-width: unset;
   }
   .price-table-scroller { margin-top: 40px; }
   .pricing-cta .btn { width: 100%; max-width: 340px; min-height: 52px; }
+  /* Equal-width columns (table-layout: fixed equivalent for Grid) */
+  .pt-row { grid-template-columns: repeat(4, 1fr); }
+  /* All cells: compact, centered */
+  .pt-c { padding: 10px 6px; font-size: 0.78rem; align-items: center; justify-content: center; }
+  /* First column (model name): left-aligned, slightly smaller */
+  .pt-c--name { font-size: 0.72rem; padding: 10px 4px; align-items: flex-start; justify-content: flex-start; }
+  .pt-c--name b { font-size: 0.78rem; }
+  /* Price values: bold */
+  .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-weight: 600; }
 
   /* ── Carousel: hide arrows — swipe/touch handles nav ── */
   .carousel-arrow { display: none; }
@@ -1434,7 +1440,9 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .bento-card--assurance { min-height: 130px; flex-direction: row; }
 
   /* ── Pricing: even more compact ── */
-  .price-table { min-width: 440px; }
+  .price-table { min-width: unset; }
+  .pt-c { padding: 8px 4px; font-size: 0.72rem; }
+  .pt-c--name b { font-size: 0.72rem; }
 
   /* ── Carousel: enforce full-width, no scale/blur ── */
   .carousel-slide {
