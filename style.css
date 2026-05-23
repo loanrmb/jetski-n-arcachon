@@ -1176,9 +1176,19 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 }
 .intro-hero-el.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
-/* Fade-only variant: no vertical movement (used on hero CTA button) */
-.hero-fade-only               { transform: none !important; }
-.hero-fade-only.visible       { transform: none !important; }
+/* Fade-only variant: no vertical movement (used on hero CTA button).
+   transition !important beats .btn's own transition !important
+   because this rule appears later in the file (same specificity,
+   source-order wins).                                             */
+.hero-fade-only {
+  opacity: 0;
+  transform: none !important;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.hero-fade-only.visible {
+  opacity: 1;
+  transform: none !important;
+}
 
 /* ════════════════════════════════
    MÉTÉO — section live Arcachon
