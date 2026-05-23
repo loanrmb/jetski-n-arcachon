@@ -810,7 +810,7 @@ setTimeout(() => {
     'https://api.open-meteo.com/v1/forecast' +
     '?latitude=44.66&longitude=-1.17' +
     '&current=temperature_2m,windspeed_10m,weathercode' +
-    '&daily=weathercode_dominant,temperature_2m_max,temperature_2m_min,windspeed_10m_max' +
+    '&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max' +
     '&wind_speed_unit=kn&forecast_days=5&timezone=Europe%2FParis';
 
   const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -873,7 +873,7 @@ setTimeout(() => {
     const el = document.getElementById('weatherForecast');
     if (!el) return;
     el.innerHTML = daily.time.map((dateStr, i) => {
-      const code = daily.weathercode_dominant[i];
+      const code = daily.weathercode[i];
       const tmax = Math.round(daily.temperature_2m_max[i]);
       const tmin = Math.round(daily.temperature_2m_min[i]);
       const dow  = new Date(dateStr + 'T12:00:00').getDay();
