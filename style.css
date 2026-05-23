@@ -637,20 +637,46 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   background: #C8DEFA;
 }
 
-.map-svg {
+.map-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-@keyframes mapPulse {
-  0%   { r: 10; opacity: 0.5; }
-  50%  { r: 18; opacity: 0.1; }
-  100% { r: 10; opacity: 0.5; }
+/* Pin animé positionné sur Arcachon */
+.map-pin {
+  position: absolute;
+  left: 40%;
+  top: 65%;
+  transform: translate(-50%, -100%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.map-pulse { animation: mapPulse 2s ease-in-out infinite; }
+.map-pin-svg {
+  width: 28px;
+  height: 36px;
+  filter: drop-shadow(0 4px 8px rgba(0,113,227,0.45));
+}
+.map-pin-pulse {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #0071E3;
+  animation: mapPinPulse 2s ease-in-out infinite;
+}
+@keyframes mapPinPulse {
+  0%, 100% { transform: translateX(-50%) scale(1);   opacity: 0.55; }
+  50%       { transform: translateX(-50%) scale(2.2); opacity: 0;    }
+}
 
 .map-badge {
   position: absolute;

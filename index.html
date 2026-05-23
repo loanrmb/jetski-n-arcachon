@@ -420,60 +420,15 @@
 
       <div class="loc-map">
         <div class="map-static">
-          <svg class="map-svg" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-            <defs>
-              <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#A8C8F0"/>
-                <stop offset="100%" stop-color="#D4E8FF"/>
-              </linearGradient>
-              <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#0071E3" stop-opacity="0.25"/>
-                <stop offset="100%" stop-color="#0071E3" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <rect width="520" height="400" fill="url(#waterGrad)"/>
-            <!-- Terre Est (Arcachon) -->
-            <path d="M320,0 L520,0 L520,400 L380,400 L360,340 L340,280 L360,220 L380,160 L340,100 L320,40 Z" fill="#E8F0D8"/>
-            <path d="M320,40 L380,80 L400,120 L380,160 L340,100 Z" fill="#E0D8C8"/>
-            <!-- Cap Ferret -->
-            <path d="M80,0 L140,0 L160,60 L140,120 L120,180 L100,240 L80,280 L60,260 L40,200 L60,140 L80,80 Z" fill="#E8F0D8"/>
-            <!-- Île aux Oiseaux -->
-            <ellipse cx="250" cy="260" rx="28" ry="16" fill="#E8EDD8" opacity="0.9"/>
-            <!-- Routes -->
-            <path d="M340,100 L380,160 L400,220 L380,280" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
-            <path d="M340,100 L320,80 L300,60" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
-            <path d="M120,80 L100,120 L80,180 L80,260" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
-            <!-- Jetée Thiers -->
-            <rect x="335" y="148" width="40" height="6" rx="3" fill="#C8B89A" opacity="0.9"/>
-            <rect x="355" y="148" width="4" height="20" rx="2" fill="#C8B89A" opacity="0.9"/>
-            <!-- Labels -->
-            <text x="250" y="255" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#6A7A4A" font-weight="600" opacity="0.8">Île aux Oiseaux</text>
-            <text x="105" y="160" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#4A6A3A" font-weight="500" opacity="0.9">Cap Ferret</text>
-            <text x="220" y="180" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#5A7AA8" font-weight="500" opacity="0.7">Bassin d'Arcachon</text>
-            <text x="370" y="132" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#3A3A4A" font-weight="600" opacity="0.9">Arcachon</text>
-            <!-- Glow pin -->
-            <circle cx="358" cy="158" r="26" fill="url(#pinGlow)"/>
-            <!-- Pin marker -->
-            <g transform="translate(346,134)">
-              <path d="M12 0C7.6 0 4 3.6 4 8c0 5.4 8 16 8 16s8-10.6 8-16c0-4.4-3.6-8-8-8z" fill="#0071E3" filter="drop-shadow(0 3px 6px rgba(0,113,227,0.45))"/>
+          <img src="images/arcachon-map.png" class="map-img" alt="Bassin d'Arcachon — vue satellite">
+          <!-- Pin animé positionné sur Arcachon (~40% left, 65% top) -->
+          <div class="map-pin">
+            <div class="map-pin-pulse"></div>
+            <svg class="map-pin-svg" viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 0C7.6 0 4 3.6 4 8c0 5.4 8 16 8 16s8-10.6 8-16c0-4.4-3.6-8-8-8z" fill="#0071E3" filter="drop-shadow(0 3px 6px rgba(0,113,227,0.5))"/>
               <circle cx="12" cy="8" r="3.5" fill="white"/>
-            </g>
-            <!-- Pulse -->
-            <circle cx="358" cy="142" r="10" fill="none" stroke="#0071E3" stroke-width="1.5" opacity="0.5" class="map-pulse"/>
-            <!-- Boussole -->
-            <g transform="translate(472,28)">
-              <circle cx="0" cy="0" r="16" fill="white" opacity="0.85" filter="drop-shadow(0 2px 8px rgba(0,0,0,0.12))"/>
-              <text x="0" y="-5" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#0071E3" font-weight="700">N</text>
-              <polygon points="0,-12 3,-2 0,-5 -3,-2" fill="#0071E3"/>
-              <polygon points="0,12 3,2 0,5 -3,2" fill="#C0C0C8"/>
-            </g>
-            <!-- Échelle -->
-            <g transform="translate(30,370)">
-              <rect x="0" y="0" width="60" height="4" rx="2" fill="white" opacity="0.7"/>
-              <text x="0" y="16" font-family="-apple-system,sans-serif" font-size="8" fill="white" opacity="0.8">0</text>
-              <text x="46" y="16" font-family="-apple-system,sans-serif" font-size="8" fill="white" opacity="0.8">2 km</text>
-            </g>
-          </svg>
+            </svg>
+          </div>
           <div class="map-badge">
             <div class="map-badge-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
