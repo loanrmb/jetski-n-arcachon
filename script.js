@@ -1054,3 +1054,92 @@ setTimeout(() => {
 
   fetchWeather();
 }());
+
+/* ─────────────────────────────
+   CAROUSEL — Expérience & Sécurité
+   Auto-advance · arrows · dots · keyboard · swipe
+───────────────────────────── */
+(function () {
+  const viewport = document.getElementById('carouselViewport');
+  const track    = document.getElementById('carouselTrack');
+  if (!track) return;
+
+  const slides = Array.from(track.querySelectorAll('.carousel-slide'));
+  const dots   = Array.from(document.querySelectorAll('#carouselDots .carousel-dot'));
+  const prev   = document.getElementById('carouselPrev');
+  const next   = document.getElementById('carouselNext');
+  const TOTAL  = slides.length;
+  const GAP    = 20; // must match CSS gap on .carousel-track
+  let current  = 0;
+  let autoTimer = null;
+
+  /* Center slide idx inside the viewport */
+  function getOffset(idx) {
+    const vw     = viewport.offsetWidth;
+    const slideW = slides[0].offsetWidth;
+    return (vw - slideW) / 2 - idx * (slideW + GAP);
+  }
+
+  function go(idx, immediate) {
+    current = ((idx % TOTAL) + TOTAL) % TOTAL;
+
+    if (immediate) track.classList.add('no-transition');
+    track.style.transform = `translateX(${getOffset(current)}px)`;
+    if (immediate) requestAnimationFrame(() => track.classList.remove('no-transition'));
+
+    slides.forEach((s, i) => s.classList.toggle('cs-active', i === current));
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  function startAuto() {
+    stopAuto();
+    autoTimer = setInterval(() => go(current + 1), 5000);
+  }
+  function stopAuto() {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  }
+
+  /* Init — snap to position 0 without animating */
+  go(0, true);
+  startAuto();
+
+  /* Arrows */
+  prev.addEventListener('click', () => { go(current - 1); startAuto(); });
+  next.addEventListener('click', () => { go(current + 1); startAuto(); });
+
+  /* Dots */
+  dots.forEach(d =>
+    d.addEventListener('click', () => { go(+d.dataset.dot); startAuto(); })
+  );
+
+  /* Keyboard */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  { go(current - 1); startAuto(); }
+    if (e.key === 'ArrowRight') { go(current + 1); startAuto(); }
+  });
+
+  /* Pause on hover */
+  viewport.addEventListener('mouseenter', stopAuto);
+  viewport.addEventListener('mouseleave', startAuto);
+
+  /* Touch / swipe */
+  let touchStartX = 0;
+  viewport.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  viewport.addEventListener('touchend', e => {
+    const delta = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) {
+      go(delta > 0 ? current + 1 : current - 1);
+      startAuto();
+    }
+  }, { passive: true });
+
+  /* Recalculate on resize */
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => go(current, true), 100);
+  }, { passive: true });
+}());
+

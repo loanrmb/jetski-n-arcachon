@@ -400,24 +400,70 @@
   </div>
 </section>
 
-<!-- GALLERY -->
-<section class="gallery">
-  <div class="gblock">
-    <div class="gimg"><img src="images/lifestyle-1.jpg" alt="Pilotes sur le Bassin d'Arcachon"></div>
-    <div class="gtxt">
-      <p class="eyebrow">L'expérience</p>
-      <h2>Le Bassin comme vous ne l'avez jamais vu.</h2>
-      <p>Découvrez les cabanes tchanquées, l'Île aux Oiseaux et la Dune du Pilat depuis l'eau. Un terrain de jeu unique à explorer seul, en duo ou en famille.</p>
+<!-- CAROUSEL — EXPÉRIENCE & SÉCURITÉ -->
+<section class="carousel-section" id="experience">
+
+  <div class="carousel-viewport" id="carouselViewport">
+    <div class="carousel-track" id="carouselTrack">
+
+      <div class="carousel-slide cs-active" data-idx="0">
+        <img src="images/jetski-bassin-arcachon-1.jpg" alt="Jet ski sur le Bassin d'Arcachon" class="carousel-img">
+      </div>
+      <div class="carousel-slide" data-idx="1">
+        <img src="images/jetski-bassin-arcachon-2.jpg" alt="Bassin d'Arcachon vu du large" class="carousel-img">
+      </div>
+      <div class="carousel-slide" data-idx="2">
+        <img src="images/jetski-bassin-arcachon-3.jpg" alt="Cap Ferret depuis le jet ski" class="carousel-img">
+      </div>
+      <div class="carousel-slide" data-idx="3">
+        <img src="images/jetski-bassin-arcachon-4.jpg" alt="Île aux Oiseaux en jet ski" class="carousel-img">
+      </div>
+      <div class="carousel-slide" data-idx="4">
+        <img src="images/jetski-bassin-arcachon-5.jpg" alt="Dune du Pilat depuis l'eau" class="carousel-img">
+      </div>
+      <div class="carousel-slide" data-idx="5">
+        <img src="images/jetski-bassin-arcachon-6.jpg" alt="Coucher de soleil sur le Bassin" class="carousel-img">
+      </div>
+
+    </div>
+
+    <button class="carousel-arrow carousel-arrow--prev" id="carouselPrev" aria-label="Précédent">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="carousel-arrow carousel-arrow--next" id="carouselNext" aria-label="Suivant">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <div class="carousel-dots" id="carouselDots">
+    <button class="carousel-dot active" data-dot="0" aria-label="Slide 1"></button>
+    <button class="carousel-dot" data-dot="1" aria-label="Slide 2"></button>
+    <button class="carousel-dot" data-dot="2" aria-label="Slide 3"></button>
+    <button class="carousel-dot" data-dot="3" aria-label="Slide 4"></button>
+    <button class="carousel-dot" data-dot="4" aria-label="Slide 5"></button>
+    <button class="carousel-dot" data-dot="5" aria-label="Slide 6"></button>
+  </div>
+
+  <div class="container">
+    <div class="carousel-textblock">
+
+      <div class="carousel-textcol">
+        <p class="eyebrow">L'expérience</p>
+        <h2>Le Bassin comme vous ne l'avez jamais vu.</h2>
+        <p class="carousel-body">Découvrez les cabanes tchanquées, l'Île aux Oiseaux et la Dune du Pilat depuis l'eau. Un terrain de jeu unique à explorer seul, en duo ou en famille.</p>
+      </div>
+
+      <div class="carousel-divider" aria-hidden="true"></div>
+
+      <div class="carousel-textcol">
+        <p class="eyebrow">La sécurité</p>
+        <h2>Un briefing complet, chaque fois.</h2>
+        <p class="carousel-body">Avant chaque sortie, notre équipe vous explique les règles de navigation, les zones protégées et le fonctionnement du jet ski. Vous partez serein.</p>
+      </div>
+
     </div>
   </div>
-  <div class="gblock gblock--rev">
-    <div class="gimg"><img src="images/lifestyle-2.jpg" alt="Vue sur la côte atlantique"></div>
-    <div class="gtxt">
-      <p class="eyebrow">La sécurité</p>
-      <h2>Un briefing complet, chaque fois.</h2>
-      <p>Avant chaque sortie, notre équipe vous explique les règles de navigation, les zones protégées et le fonctionnement du jet ski. Vous partez serein.</p>
-    </div>
-  </div>
+
 </section>
 
 <!-- LOCATION -->

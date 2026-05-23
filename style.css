@@ -362,6 +362,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   object-fit: cover;
   object-position: center;
   display: block;
+  transform: scale(1); /* prevent any inherited or hover-induced zoom */
 }
 
 .bento-overlay {
@@ -501,6 +502,130 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .gtxt h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); }
 .gtxt p  { font-size: 1rem; color: var(--text2); line-height: 1.7; max-width: 380px; }
 
+/* === CAROUSEL EXPERIENCE === */
+.carousel-section {
+  background: #ffffff;
+  padding: 100px 0 80px;
+  overflow: hidden; /* clips partial side cards at page edges */
+}
+
+.carousel-viewport {
+  position: relative;
+  overflow: visible; /* lets scaled side cards show */
+  padding: 20px 0;   /* breathing room for scale effect */
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  will-change: transform;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.carousel-track.no-transition { transition: none !important; }
+
+.carousel-slide {
+  flex: 0 0 auto;
+  width: 76vw;
+  border-radius: 24px;
+  overflow: hidden;
+  transform: scale(0.88);
+  filter: blur(2px);
+  opacity: 0.5;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter    0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, filter, opacity;
+}
+.carousel-slide.cs-active {
+  transform: scale(1);
+  filter: none;
+  opacity: 1;
+}
+
+.carousel-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+/* Arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.82);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+  transition: background 0.2s var(--ease), box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
+  z-index: 10;
+}
+.carousel-arrow:hover {
+  background: rgba(255,255,255,0.97);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  transform: translateY(-50%) scale(1.07);
+}
+/* Sit right at the active card edges (12% inset = (100-76)/2) */
+.carousel-arrow--prev { left:  calc(12vw - 22px); }
+.carousel-arrow--next { right: calc(12vw - 22px); }
+
+/* Dots */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+.carousel-dot {
+  height: 7px;
+  width: 7px;
+  border-radius: 100px;
+  background: #c7c7cc;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s;
+}
+.carousel-dot.active {
+  width: 22px;
+  background: #1d1d1f;
+}
+
+/* Text block */
+.carousel-textblock {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0 56px;
+  margin-top: 64px;
+  align-items: start;
+}
+.carousel-textcol h2 {
+  font-size: clamp(1.45rem, 2.3vw, 1.85rem);
+  margin: 10px 0 14px;
+}
+.carousel-body {
+  font-size: 1rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.carousel-divider {
+  background: var(--border-lt);
+  align-self: stretch;
+  width: 1px;
+}
+
 /* ════════════════════════════════
    LOCATION
 ════════════════════════════════ */
@@ -570,6 +695,10 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .gimg img { min-height: 280px; }
   .pt-row  { grid-template-columns: 130px 1fr 1fr 1fr; }
   .mt-img  { height: 280px; padding: 24px 32px 0; }
+  /* Carousel — tablet */
+  .carousel-slide { width: 84vw; }
+  .carousel-arrow--prev { left: 8px; }
+  .carousel-arrow--next { right: 8px; }
   /* Bento — 2 colonnes */
   .bento-grid {
     grid-template-columns: 1fr 1fr;
@@ -587,6 +716,22 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .inc-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .inc-emoji { font-size: 48px; }
   .inc-visual { height: 120px; }
+  /* Carousel — mobile: full-width, no side peek effect */
+  .carousel-section { padding: 72px 0 56px; }
+  .carousel-slide {
+    width: 92vw;
+    transform: scale(1) !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+  .carousel-textblock {
+    grid-template-columns: 1fr;
+    gap: 36px 0;
+    margin-top: 40px;
+  }
+  .carousel-divider { width: 100%; height: 1px; align-self: auto; }
+  .carousel-arrow--prev { left: 8px; }
+  .carousel-arrow--next { right: 8px; }
   /* Bento — 1 colonne */
   .bento-grid {
     grid-template-columns: 1fr;
