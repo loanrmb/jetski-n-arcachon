@@ -909,20 +909,57 @@ setTimeout(() => {
     return             { label: 'Sortie déconseillée',        cls: 'weather-badge--danger' };
   }
 
-  function buildForecast(daily) {
+  function emojiForCode(code) {
+    if (code === 0)                                                return '☀️';
+    if (code === 1)                                                return '🌤';
+    if (code === 2)                                                return '⛅';
+    if (code === 3)                                                return '☁️';
+    if (code === 45 || code === 48)                                return '🌫';
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '🌧';
+    if (code >= 71 && code <= 77)                                  return '❄️';
+    if (code >= 95)                                                return '⛈';
+    return '🌥';
+  }
+
+  function buildForecast(daily, currentTemp) {
     const el = document.getElementById('weatherForecast');
     if (!el) return;
+
+    const tmaxs     = daily.temperature_2m_max;
+    const tmins     = daily.temperature_2m_min;
+    const globalMin = Math.min(...tmins);
+    const globalMax = Math.max(...tmaxs);
+    const range     = globalMax - globalMin || 1;
+
     el.innerHTML = daily.time.map((dateStr, i) => {
-      const code = daily.weathercode[i];
-      const tmax = Math.round(daily.temperature_2m_max[i]);
-      const tmin = Math.round(daily.temperature_2m_min[i]);
-      const dow  = new Date(dateStr + 'T12:00:00').getDay();
-      const day  = i === 0 ? "Aujourd'hui" : i === 1 ? 'Demain' : DAYS_FR[dow];
-      return '<div class="wf-card' + (i === 0 ? ' wf-today' : '') + '">' +
+      const code  = daily.weathercode[i];
+      const tmax  = Math.round(tmaxs[i]);
+      const tmin  = Math.round(tmins[i]);
+      const dow   = new Date(dateStr + 'T12:00:00').getDay();
+      const day   = i === 0 ? 'Auj.' : i === 1 ? 'Dem.' : DAYS_FR[dow] + '.';
+      const emoji = emojiForCode(code);
+
+      // Bar segment: left offset + width as % of global range
+      const barLeft  = ((tmin - globalMin) / range * 100).toFixed(1);
+      const barWidth = ((tmax - tmin)      / range * 100).toFixed(1);
+
+      // Current-temp dot on today's row only
+      let dotHtml = '';
+      if (i === 0 && currentTemp != null) {
+        const clamped = Math.max(globalMin, Math.min(globalMax, currentTemp));
+        const dotLeft = ((clamped - globalMin) / range * 100).toFixed(1);
+        dotHtml = '<span class="wf-dot" style="left:' + dotLeft + '%"></span>';
+      }
+
+      return '<div class="wf-row">' +
         '<span class="wf-day">' + day + '</span>' +
-        buildSvg(code, 'wf-icon') +
-        '<span class="wf-tmax">' + tmax + '°</span>' +
-        '<span class="wf-tmin">' + tmin + '°</span>' +
+        '<span class="wf-emoji">' + emoji + '</span>' +
+        '<span class="wf-lo">' + tmin + '°</span>' +
+        '<div class="wf-bar-wrap">' +
+          '<div class="wf-bar" style="left:' + barLeft + '%;width:' + barWidth + '%"></div>' +
+          dotHtml +
+        '</div>' +
+        '<span class="wf-hi">' + tmax + '°</span>' +
         '</div>';
     }).join('');
   }
@@ -979,7 +1016,7 @@ setTimeout(() => {
       document.getElementById('weatherLabel').textContent = cond.label;
 
       // ② Prévisions 5 jours
-      buildForecast(d);
+      buildForecast(d, temp);
 
       // ③ CTA dynamique
       buildCta(code, wind);
