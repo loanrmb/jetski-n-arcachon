@@ -787,18 +787,6 @@ function staggerRAF(elements, msPerStep, onReveal) {
   }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
   incCards.forEach(el => incObs.observe(el));
 
-  // Gallery blocks
-  const gblocks = document.querySelectorAll('.gblock');
-  const gObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        gObs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  gblocks.forEach(el => gObs.observe(el));
-
   // Location section
   const locInfo = document.querySelector('.loc-info');
   const locMap  = document.querySelector('.loc-map');
@@ -939,11 +927,6 @@ setTimeout(() => {
     if (code >= 71 && code <= 77)     return 'snow';
     if (code >= 95)                   return 'storm';
     return 'rain'; // 51–67, 80–82
-  }
-
-  function buildSvg(code, cls) {
-    return '<svg class="' + cls + '" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-      SHAPES[shapeType(code)] + '</svg>';
   }
 
   function getCondition(windKn) {
