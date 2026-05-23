@@ -811,7 +811,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
           ptFlipObs.disconnect();
         }
       });
-    }, { threshold: 0.2 });
+    }, { threshold: 0.05 });
     ptFlipObs.observe(priceTable);
   }
 })();
