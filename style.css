@@ -1176,6 +1176,10 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 }
 .intro-hero-el.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
+/* Fade-only variant: no vertical movement (used on hero CTA button) */
+.hero-fade-only               { transform: none !important; }
+.hero-fade-only.visible       { transform: none !important; }
+
 /* ════════════════════════════════
    MÉTÉO — section live Arcachon
 ════════════════════════════════ */
@@ -1400,4 +1404,130 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 @media (max-width: 600px) {
   .avail-card { padding: 20px 16px; }
   .avail { padding: 72px 0; }
+}
+
+/* ════════════════════════════════
+   MOBILE RESPONSIVE — ≤768px
+   Supplements existing breakpoints.
+   Placed last so it wins the cascade
+   for any rule it declares.
+════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Nav: hide the Réserver btn inside the nav bar on mobile
+        (it's still accessible in the hamburger menu)         ── */
+  .nav-links a.btn { display: none; }
+
+  /* ── Hero: scaled type, bigger CTA tap target ── */
+  .intro { padding: 96px 0 60px; }
+  .intro h1 { font-size: 2.4rem; line-height: 1.2; }
+  .intro-sub { font-size: 1rem; }
+  .intro .btn { min-height: 52px; font-size: 1rem; padding: 14px 28px; }
+
+  /* ── Models: tabs become a horizontally-scrollable snap row ── */
+  .mt-tabs {
+    justify-content: flex-start;
+    padding: 28px 20px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mt-tabs::-webkit-scrollbar { display: none; }
+  .mt-tabs-inner { flex-wrap: nowrap; }
+  .mt-tab { flex-shrink: 0; }
+
+  /* ── Pricing: wrap scrolls horizontally, CTA expands ── */
+  .price-table-scroller {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--r18);
+    /* right-edge fade hints there's more content to scroll */
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 85%, transparent 100%);
+  }
+  /* remove inner border-radius so scroller's radius shows cleanly */
+  .price-table {
+    border-radius: 0;
+    margin-top: 0;
+    min-width: 520px;
+  }
+  .price-table-scroller { margin-top: 40px; }
+  .pricing-cta .btn { width: 100%; max-width: 340px; min-height: 52px; }
+
+  /* ── Carousel: hide arrows — swipe/touch handles nav ── */
+  .carousel-arrow { display: none; }
+
+  /* ── Final CTA: taller button ── */
+  .finalcta .btn { min-height: 52px; }
+
+  /* ── Touch targets: minimum 44px everywhere ── */
+  .btn { min-height: 44px; }
+  .cal-d { min-height: 36px; }
+  .loc-contact-item { min-height: 44px; }
+  .carousel-dot { padding: 8px; }
+}
+
+/* ════════════════════════════════
+   MOBILE SMALL — ≤480px
+   iPhone SE (375px) and smaller.
+════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* ── Global type scale ── */
+  body { font-size: 16px; line-height: 1.65; }
+  h2   { font-size: 1.55rem; }
+
+  /* ── Hero ── */
+  .intro { padding: 88px 0 52px; }
+  .intro h1 { font-size: 2.1rem; }
+
+  /* ── Section vertical rhythm ── */
+  .avail    { padding: 64px 0; }
+  .includes { padding: 64px 0; }
+  .location { padding: 64px 0; }
+  .finalcta { padding: 64px 0; }
+  .pricing  { padding: 64px 0; }
+
+  /* ── Bento: force single column (cascades over ≤768px 2-col
+        when both rules match — this block wins because it comes
+        later in the file)                                      ── */
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "carte"
+      "shorty"
+      "gilet"
+      "briefing"
+      "sac"
+      "assurance";
+    gap: 10px;
+  }
+  .bento-card           { min-height: 200px; }
+  .bento-card--assurance { min-height: 130px; flex-direction: row; }
+
+  /* ── Pricing: even more compact ── */
+  .price-table { min-width: 440px; }
+
+  /* ── Carousel: enforce full-width, no scale/blur ── */
+  .carousel-slide {
+    width: 92vw;
+    transform: scale(1) !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+
+  /* ── Models: extra compact ── */
+  .mt-img   { height: 200px; padding: 16px 16px 0; }
+  .mt-model { font-size: 1.85rem; }
+  .mt-sv    { font-size: 1.3rem; }
+  .mt-sep   { height: 28px; }
+  .mt-info  { padding: 18px 20px 40px; }
+
+  /* ── Footer: wrap links ── */
+  .footer-links { flex-wrap: wrap; justify-content: center; gap: 14px 20px; }
+
+  /* ── Modal: compact ── */
+  .modal { padding: 20px 16px 24px; }
+  .field-row { grid-template-columns: 1fr; }
 }
