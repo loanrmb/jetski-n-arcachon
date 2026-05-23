@@ -758,14 +758,19 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .loc-map.visible { opacity: 1; transform: none; }
 
 /* ════════════════════════════════
-   PRICING TABLE — stagger reveal
+   PRICING TABLE — airport flip reveal
 ════════════════════════════════ */
-.pt-row:not(.pt-head) {
+.pt-row:not(.pt-head) .pt-c:not(.pt-c--name) {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1), transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  transform: perspective(400px) rotateX(-90deg);
+  transform-origin: top center;
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  backface-visibility: hidden;
 }
-.pt-row:not(.pt-head).visible { opacity: 1; transform: none; }
+.pt-row:not(.pt-head) .pt-c:not(.pt-c--name).visible {
+  opacity: 1;
+  transform: perspective(400px) rotateX(0deg);
+}
 
 /* ════════════════════════════════
    HERO TEXT — entrance sequence

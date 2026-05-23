@@ -771,18 +771,26 @@ init();
     locObs.observe(locMap);
   }
 
-  // Staggered pricing rows (skip header)
-  const ptRows = document.querySelectorAll('.pt-row:not(.pt-head)');
-  const ptObs  = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        const idx = Array.from(ptRows).indexOf(e.target);
-        setTimeout(() => { e.target.classList.add('visible'); }, idx * 100);
-        ptObs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -20px 0px' });
-  ptRows.forEach(el => ptObs.observe(el));
+  // Airport flip — price cells (left-to-right, row-by-row, 80ms stagger)
+  const ptFlipCells = Array.from(
+    document.querySelectorAll('.pt-row:not(.pt-head) .pt-c:not(.pt-c--name)')
+  );
+  const priceTable = document.querySelector('.price-table');
+  if (priceTable && ptFlipCells.length) {
+    let ptFlipDone = false;
+    const ptFlipObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !ptFlipDone) {
+          ptFlipDone = true;
+          ptFlipCells.forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), i * 80);
+          });
+          ptFlipObs.disconnect();
+        }
+      });
+    }, { threshold: 0.2 });
+    ptFlipObs.observe(priceTable);
+  }
 })();
 
 /* ─────────────────────────────
