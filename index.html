@@ -259,7 +259,9 @@
 <section class="weather-section" id="meteo">
   <div class="container">
     <p class="eyebrow">Conditions actuelles</p>
-    <h2>Météo Arcachon</h2>
+    <h2>Météo à Arcachon en direct</h2>
+
+    <!-- Carte conditions actuelles -->
     <div class="weather-card reveal">
       <div class="weather-inner">
         <div class="weather-icon-wrap" id="weatherIcon">
@@ -285,8 +287,14 @@
           <span id="weatherLabel">Chargement…</span>
         </div>
       </div>
-      <p class="weather-source">Météo en direct · Arcachon · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
     </div>
+
+    <!-- Prévisions 5 jours (injectées par JS) -->
+    <div class="weather-forecast" id="weatherForecast"></div>
+
+    <!-- CTA dynamique (injecté par JS) -->
+    <div class="weather-cta" id="weatherCta"></div>
+
   </div>
 </section>
 

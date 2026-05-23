@@ -792,14 +792,14 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 }
 .weather-section h2 { margin-bottom: 32px; }
 
+/* ── Carte conditions actuelles ── */
 .weather-card {
   background: rgba(255,255,255,0.72);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255,255,255,0.9);
   border-radius: 24px;
-  padding: 28px 36px 20px;
-  max-width: 680px;
+  padding: 28px 36px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.8) inset;
   transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
 }
@@ -807,21 +807,18 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   box-shadow: 0 16px 48px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
   transform: translateY(-2px);
 }
-
 .weather-inner {
   display: flex;
   align-items: center;
   gap: 28px;
   flex-wrap: wrap;
 }
-
 .weather-icon-wrap {
   flex-shrink: 0;
   width: 56px; height: 56px;
   display: flex; align-items: center; justify-content: center;
 }
 .weather-icon { width: 56px; height: 56px; display: block; }
-
 .weather-data {
   display: flex;
   align-items: center;
@@ -866,8 +863,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   background: var(--border-lt);
   flex-shrink: 0;
 }
-
-/* Badge conditions */
 .weather-badge {
   display: flex;
   align-items: center;
@@ -892,19 +887,94 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .weather-badge--caution { background: #FFF7ED; color: #D97706; }
 .weather-badge--danger  { background: #FFF1F2; color: #E11D48; }
 
-.weather-source {
-  font-size: 0.7rem;
-  color: var(--text3);
+/* ── Prévisions 5 jours ── */
+.weather-forecast {
+  display: flex;
+  gap: 12px;
   margin-top: 16px;
-  text-align: right;
 }
-.weather-source a { color: var(--text3); }
-.weather-source a:hover { color: var(--text2); text-decoration: underline; }
+.wf-card {
+  flex: 1;
+  background: rgba(255,255,255,0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 18px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s var(--ease);
+}
+.wf-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.09);
+}
+.wf-today {
+  background: rgba(0,113,227,0.07);
+  border-color: rgba(0,113,227,0.22);
+  padding: 20px 8px;
+  box-shadow: 0 4px 16px rgba(0,113,227,0.09);
+}
+.wf-day {
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text3);
+}
+.wf-today .wf-day { color: var(--blue); }
+.wf-icon { width: 32px; height: 32px; display: block; }
+.wf-tmax {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-top: 2px;
+}
+.wf-tmin {
+  font-size: 0.75rem;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+/* ── CTA dynamique ── */
+.weather-cta {
+  margin-top: 16px;
+  background: rgba(255,255,255,0.6);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.85);
+  border-radius: 20px;
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+.weather-cta:empty { display: none; }
+.weather-cta-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.5;
+  flex: 1;
+}
 
 @media (max-width: 600px) {
   .weather-section { padding: 60px 0; }
   .weather-inner { gap: 16px; }
   .weather-badge { margin-left: 0; width: 100%; justify-content: center; }
+  .weather-forecast { gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .wf-card { min-width: 64px; border-radius: 14px; padding: 12px 4px; }
+  .wf-today { padding: 16px 4px; }
+  .wf-day { font-size: 0.56rem; }
+  .wf-tmax { font-size: 0.9rem; }
+  .weather-cta { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+  .weather-cta .btn { width: 100%; text-align: center; }
 }
 
 /* ════════════════════════════════

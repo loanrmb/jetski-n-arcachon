@@ -806,57 +806,60 @@ setTimeout(() => {
    MÉTÉO — Open-Meteo live data
 ───────────────────────────── */
 (function () {
-  const METEO_URL =
+  const BASE =
     'https://api.open-meteo.com/v1/forecast' +
     '?latitude=44.66&longitude=-1.17' +
     '&current=temperature_2m,windspeed_10m,weathercode' +
-    '&wind_speed_unit=kn&timezone=Europe%2FParis';
+    '&daily=weathercode_dominant,temperature_2m_max,temperature_2m_min,windspeed_10m_max' +
+    '&wind_speed_unit=kn&forecast_days=5&timezone=Europe%2FParis';
 
-  // ── SVG icons ──────────────────────────────────────────────────
-  const SVG_SUN = `<svg class="weather-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="24" cy="24" r="9" fill="#FBBF24"/>
-    <g stroke="#FBBF24" stroke-width="3" stroke-linecap="round">
-      <line x1="24" y1="4"    x2="24" y2="10"/>
-      <line x1="24" y1="38"   x2="24" y2="44"/>
-      <line x1="8.1" y1="8.1" x2="12.3" y2="12.3"/>
-      <line x1="35.7" y1="35.7" x2="39.9" y2="39.9"/>
-      <line x1="4"  y1="24"   x2="10"  y2="24"/>
-      <line x1="38" y1="24"   x2="44"  y2="24"/>
-      <line x1="8.1"  y1="39.9" x2="12.3" y2="35.7"/>
-      <line x1="35.7" y1="12.3" x2="39.9" y2="8.1"/>
-    </g>
-  </svg>`;
+  const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
-  const SVG_CLOUD = `<svg class="weather-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="33" cy="18" r="6" fill="#FBBF24" opacity="0.9"/>
-    <circle cx="19" cy="28" r="9" fill="#94A3B8"/>
-    <circle cx="30" cy="24" r="10" fill="#94A3B8"/>
-    <rect x="10" y="28" width="28" height="10" rx="5" fill="#94A3B8"/>
-  </svg>`;
+  // ── SVG shapes (viewBox 0 0 48 48) ──────────────────────────────
+  const SHAPES = {
+    sun:
+      '<circle cx="24" cy="24" r="9" fill="#FBBF24"/>' +
+      '<g stroke="#FBBF24" stroke-width="3" stroke-linecap="round">' +
+        '<line x1="24" y1="4"    x2="24"  y2="10"/>' +
+        '<line x1="24" y1="38"   x2="24"  y2="44"/>' +
+        '<line x1="8.1" y1="8.1"   x2="12.3" y2="12.3"/>' +
+        '<line x1="35.7" y1="35.7" x2="39.9" y2="39.9"/>' +
+        '<line x1="4"  y1="24"   x2="10"  y2="24"/>' +
+        '<line x1="38" y1="24"   x2="44"  y2="24"/>' +
+        '<line x1="8.1"  y1="39.9" x2="12.3" y2="35.7"/>' +
+        '<line x1="35.7" y1="12.3" x2="39.9" y2="8.1"/>' +
+      '</g>',
+    cloud:
+      '<circle cx="33" cy="18" r="6"  fill="#FBBF24" opacity="0.9"/>' +
+      '<circle cx="19" cy="28" r="9"  fill="#94A3B8"/>' +
+      '<circle cx="30" cy="24" r="10" fill="#94A3B8"/>' +
+      '<rect x="10" y="28" width="28" height="10" rx="5" fill="#94A3B8"/>',
+    rain:
+      '<circle cx="18" cy="21" r="9"  fill="#64748B"/>' +
+      '<circle cx="30" cy="17" r="11" fill="#64748B"/>' +
+      '<rect x="9" y="21" width="28" height="10" rx="5" fill="#64748B"/>' +
+      '<g stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round">' +
+        '<line x1="16" y1="36" x2="14" y2="43"/>' +
+        '<line x1="24" y1="36" x2="22" y2="43"/>' +
+        '<line x1="32" y1="36" x2="30" y2="43"/>' +
+      '</g>',
+    storm:
+      '<circle cx="18" cy="20" r="9"  fill="#475569"/>' +
+      '<circle cx="30" cy="16" r="11" fill="#475569"/>' +
+      '<rect x="9" y="20" width="28" height="10" rx="5" fill="#475569"/>' +
+      '<polygon points="27,28 20,39 25,39 23,48 32,34 27,34" fill="#FCD34D"/>',
+  };
 
-  const SVG_RAIN = `<svg class="weather-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="21" r="9"  fill="#64748B"/>
-    <circle cx="30" cy="17" r="11" fill="#64748B"/>
-    <rect x="9" y="21" width="28" height="10" rx="5" fill="#64748B"/>
-    <g stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round">
-      <line x1="16" y1="36" x2="14" y2="43"/>
-      <line x1="24" y1="36" x2="22" y2="43"/>
-      <line x1="32" y1="36" x2="30" y2="43"/>
-    </g>
-  </svg>`;
+  function shapeType(code) {
+    if (code === 0)                              return 'sun';
+    if (code <= 3 || code === 45 || code === 48) return 'cloud';
+    if (code >= 95)                              return 'storm';
+    return 'rain';
+  }
 
-  const SVG_STORM = `<svg class="weather-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="20" r="9"  fill="#475569"/>
-    <circle cx="30" cy="16" r="11" fill="#475569"/>
-    <rect x="9" y="20" width="28" height="10" rx="5" fill="#475569"/>
-    <polygon points="27,28 20,39 25,39 23,48 32,34 27,34" fill="#FCD34D"/>
-  </svg>`;
-
-  function getIcon(code) {
-    if (code === 0)                          return SVG_SUN;
-    if (code <= 3 || code === 45 || code === 48) return SVG_CLOUD;
-    if (code >= 95)                          return SVG_STORM;
-    return SVG_RAIN;
+  function buildSvg(code, cls) {
+    return '<svg class="' + cls + '" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      SHAPES[shapeType(code)] + '</svg>';
   }
 
   function getCondition(windKn) {
@@ -866,17 +869,67 @@ setTimeout(() => {
     return             { label: 'Sortie déconseillée',        cls: 'weather-badge--danger' };
   }
 
+  function buildForecast(daily) {
+    const el = document.getElementById('weatherForecast');
+    if (!el) return;
+    el.innerHTML = daily.time.map((dateStr, i) => {
+      const code = daily.weathercode_dominant[i];
+      const tmax = Math.round(daily.temperature_2m_max[i]);
+      const tmin = Math.round(daily.temperature_2m_min[i]);
+      const dow  = new Date(dateStr + 'T12:00:00').getDay();
+      const day  = i === 0 ? "Aujourd'hui" : i === 1 ? 'Demain' : DAYS_FR[dow];
+      return '<div class="wf-card' + (i === 0 ? ' wf-today' : '') + '">' +
+        '<span class="wf-day">' + day + '</span>' +
+        buildSvg(code, 'wf-icon') +
+        '<span class="wf-tmax">' + tmax + '°</span>' +
+        '<span class="wf-tmin">' + tmin + '°</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  function buildCta(code, wind) {
+    const el = document.getElementById('weatherCta');
+    if (!el) return;
+    let text, btn;
+
+    if (code === 0 && wind < 10) {
+      text = "☀️ Soleil parfait aujourd'hui — les créneaux partent vite.";
+      btn  = { label: 'Réserver maintenant',    href: '#availability' };
+    } else if (code <= 3 && wind < 15) {
+      text = "🌤 Belles conditions prévues — profitez-en.";
+      btn  = { label: 'Voir les disponibilités', href: '#availability' };
+    } else if (wind >= 15 && wind <= 21) {
+      text = "💨 Ça souffle un peu — pour les amateurs de sensations.";
+      btn  = { label: 'Réserver quand même',    href: '#availability' };
+    } else if (code >= 51 && code <= 82) {
+      text = "🌧 À votre place, j'attendrais demain. Mais c'est vous qui voyez.";
+      btn  = { label: 'Voir les prévisions',     href: '#weatherForecast' };
+    } else if (code >= 95) {
+      text = "⛈ Même les dauphins restent à terre aujourd'hui.";
+      btn  = null;
+    } else {
+      // brouillard, neige, codes intermédiaires
+      text = "🌫 Conditions variables — consultez les prévisions avant de partir.";
+      btn  = { label: 'Voir les disponibilités', href: '#availability' };
+    }
+
+    el.innerHTML = '<p class="weather-cta-text">' + text + '</p>' +
+      (btn ? '<a href="' + btn.href + '" class="btn">' + btn.label + '</a>' : '');
+  }
+
   async function fetchWeather() {
     try {
-      const res  = await fetch(METEO_URL);
+      const res  = await fetch(BASE);
       const data = await res.json();
       const c    = data.current;
+      const d    = data.daily;
 
       const temp = Math.round(c.temperature_2m);
       const wind = Math.round(c.windspeed_10m);
       const code = c.weathercode;
 
-      document.getElementById('weatherIcon').innerHTML = getIcon(code);
+      // ① Conditions actuelles
+      document.getElementById('weatherIcon').innerHTML = buildSvg(code, 'weather-icon');
       document.getElementById('weatherTemp').textContent = temp;
       document.getElementById('weatherWind').textContent = wind;
 
@@ -884,6 +937,13 @@ setTimeout(() => {
       const badge = document.getElementById('weatherBadge');
       badge.className = 'weather-badge ' + cond.cls;
       document.getElementById('weatherLabel').textContent = cond.label;
+
+      // ② Prévisions 5 jours
+      buildForecast(d);
+
+      // ③ CTA dynamique
+      buildCta(code, wind);
+
     } catch {
       const badge = document.getElementById('weatherBadge');
       if (badge) badge.style.display = 'none';
