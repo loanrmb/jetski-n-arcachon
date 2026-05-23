@@ -286,7 +286,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
    INCLUDES — emoji cards
 ════════════════════════════════ */
 .includes { background: var(--bg); padding: 80px 0; }
-.includes h2 { margin-bottom: 40px; }
+.includes h2 { margin-bottom: 0; }
 
 .inc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
@@ -315,6 +315,155 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .inc-text { padding: 18px 20px 22px; }
 .inc-name { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
 .inc-desc { font-size: 0.78rem; color: var(--text2); line-height: 1.45; }
+
+/* ════════════════════════════════
+   INCLUS — BENTO GRID (Apple style)
+════════════════════════════════ */
+.bento-grid {
+  display: grid;
+  margin-top: 40px;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 270px 210px 185px;
+  grid-template-areas:
+    "carte   carte   shorty"
+    "gilet   briefing shorty"
+    "assurance assurance sac";
+}
+
+/* ── Base card ── */
+.bento-card {
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: transform 0.32s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.32s cubic-bezier(0.22,1,0.36,1);
+}
+.bento-card:hover {
+  transform: translate3d(0, -4px, 0) !important;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.14) !important;
+}
+
+/* ── Area assignments ── */
+.bento-card--carte     { grid-area: carte; }
+.bento-card--shorty    { grid-area: shorty; }
+.bento-card--gilet     { grid-area: gilet; }
+.bento-card--briefing  { grid-area: briefing; }
+.bento-card--assurance { grid-area: assurance; }
+.bento-card--sac       { grid-area: sac; }
+
+/* ── Image cards ── */
+.bento-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.bento-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.72) 0%,
+    rgba(0,0,0,0.18) 45%,
+    transparent 100%
+  );
+}
+
+/* Overlay variant that only covers the bottom quarter (shorty: preserve image detail) */
+.bento-overlay--bottom {
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.70) 0%,
+    rgba(0,0,0,0.08) 30%,
+    transparent 55%
+  );
+}
+
+.bento-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 18px 22px 20px;
+}
+
+.bento-caption-emoji {
+  font-size: 20px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.bento-card--img .bento-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
+}
+
+.bento-card--img .bento-sub {
+  font-size: 0.76rem;
+  color: rgba(255,255,255,0.68);
+  margin: 0;
+}
+
+/* Shorty — light background to contrast the dark wetsuit */
+.bento-card--shorty {
+  background: #e8e8ed;
+}
+.bento-card--shorty .bento-img {
+  object-position: center top;
+}
+
+/* ── Emoji cards ── */
+.bento-card--emoji {
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 28px;
+}
+
+.bento-emoji-lg {
+  font-size: 52px;
+  line-height: 1;
+  display: block;
+}
+
+.bento-card--emoji .bento-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
+}
+
+.bento-card--emoji .bento-sub {
+  font-size: 0.78rem;
+  color: var(--text2);
+  margin: 0;
+}
+
+/* ── Assurance — dark accent, horizontal layout ── */
+.bento-card--assurance {
+  background: var(--text);
+  flex-direction: row;
+  align-items: center;
+  gap: 22px;
+  padding: 24px 36px;
+}
+
+.bento-card--assurance .bento-emoji-lg { font-size: 44px; flex-shrink: 0; }
+.bento-card--assurance .bento-title    { color: var(--white); }
+.bento-card--assurance .bento-sub      { color: rgba(255,255,255,0.45); }
 
 /* ════════════════════════════════
    PRICING
@@ -421,6 +570,16 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .gimg img { min-height: 280px; }
   .pt-row  { grid-template-columns: 130px 1fr 1fr 1fr; }
   .mt-img  { height: 280px; padding: 24px 32px 0; }
+  /* Bento — 2 colonnes */
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 240px 220px 220px 170px;
+    grid-template-areas:
+      "carte   carte"
+      "shorty  briefing"
+      "gilet   sac"
+      "assurance assurance";
+  }
 }
 
 @media (max-width: 600px) {
@@ -428,6 +587,22 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .inc-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .inc-emoji { font-size: 48px; }
   .inc-visual { height: 120px; }
+  /* Bento — 1 colonne */
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "carte"
+      "shorty"
+      "gilet"
+      "briefing"
+      "sac"
+      "assurance";
+    gap: 10px;
+  }
+  .bento-card { min-height: 220px; }
+  .bento-card--assurance { min-height: 140px; flex-direction: row; }
+  .bento-emoji-lg { font-size: 40px; }
   .field-row { grid-template-columns: 1fr; }
   .pt-row  { grid-template-columns: 100px 1fr 1fr 1fr; }
   .pt-c, .pt-c--name { padding: 11px 10px; font-size: 0.82rem; }
@@ -451,6 +626,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .time-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .tslot   { padding: 13px 8px; font-size: 1rem; }
   .inc-grid { grid-template-columns: 1fr; }
+  .bento-card--assurance { padding: 20px 22px; }
 }
 
 /* ════════════════════════════════
