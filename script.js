@@ -781,7 +781,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
     if (incRevealPending) return;
     if (entries.some(e => e.isIntersecting)) {
       incRevealPending = true;
-      staggerRAF(incCards, 80, el => el.classList.add('visible'));
+      staggerRAF(incCards, 120, el => el.classList.add('visible'));
       incObs.disconnect();
     }
   }, { threshold: 0.1, rootMargin: '0px 0px -20px 0px' });
@@ -844,7 +844,7 @@ setTimeout(() => {
     150,
     el => el.classList.add('visible')
   );
-}, 200);
+}, 100);
 
 /* ─────────────────────────────
    MÉTÉO — Open-Meteo live data

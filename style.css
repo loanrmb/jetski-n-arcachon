@@ -504,6 +504,20 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-size: 0.95rem; font-weight: 500; color: var(--text); align-items: flex-start; justify-content: center; }
 .pt-row:not(.pt-head) .pt-c--hl { font-weight: 700; font-size: 1rem; }
 
+/* ── Pricing CTA ── */
+.pricing-cta {
+  text-align: center;
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.pricing-cta-note {
+  font-size: 0.85rem;
+  color: var(--text2);
+}
+
 /* ── Rotating phrase in pricing heading ── */
 .rotating-phrase {
   display: inline-block;
@@ -925,8 +939,8 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 .reveal {
   opacity: 0;
   transform: translate3d(0, 32px, 0);
-  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
-  will-change: transform;
+  transition: opacity 1.1s cubic-bezier(0.16,1,0.3,1), transform 1.1s cubic-bezier(0.16,1,0.3,1);
+  will-change: transform, opacity;
 }
 .reveal--right {
   transform: translate3d(32px, 0, 0);
@@ -937,7 +951,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 }
 
 /* Staggered reveal for grids */
-.inc-card { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.97); transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s var(--ease); will-change: transform; }
+.inc-card { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.97); transition: opacity 1.0s cubic-bezier(0.16,1,0.3,1), transform 1.0s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s var(--ease); will-change: transform, opacity; }
 .inc-card.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 .inc-card:hover { transform: translate3d(0, -5px, 0) scale(1.01); box-shadow: 0 16px 40px rgba(0,113,227,0.10), 0 4px 16px rgba(0,0,0,0.06); }
 
@@ -1123,15 +1137,15 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 /* ════════════════════════════════
    GALLERY BLOCKS — reveal
 ════════════════════════════════ */
-.gblock { opacity: 0; transform: translate3d(0, 24px, 0); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+.gblock { opacity: 0; transform: translate3d(0, 28px, 0); transition: opacity 1.1s cubic-bezier(0.16,1,0.3,1), transform 1.1s cubic-bezier(0.16,1,0.3,1); will-change: transform, opacity; }
 .gblock.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
 /* ════════════════════════════════
    LOC SECTION — glass info card
 ════════════════════════════════ */
-.loc-info { opacity: 0; transform: translate3d(-24px, 0, 0); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+.loc-info { opacity: 0; transform: translate3d(-24px, 0, 0); transition: opacity 1.1s cubic-bezier(0.16,1,0.3,1), transform 1.1s cubic-bezier(0.16,1,0.3,1); will-change: transform, opacity; }
 .loc-info.visible { opacity: 1; transform: translate3d(0, 0, 0); }
-.loc-map { opacity: 0; transform: translate3d(24px, 0, 0); transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s; will-change: transform; }
+.loc-map { opacity: 0; transform: translate3d(24px, 0, 0); transition: opacity 1.1s cubic-bezier(0.16,1,0.3,1), transform 1.1s cubic-bezier(0.16,1,0.3,1) 0.15s; will-change: transform, opacity; }
 .loc-map.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
 /* ════════════════════════════════
@@ -1142,7 +1156,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   transform: rotateX(-90deg);
   transform-origin: top center;
   transform-style: preserve-3d;
-  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
   backface-visibility: hidden;
   will-change: transform;
 }
@@ -1156,9 +1170,9 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 ════════════════════════════════ */
 .intro-hero-el {
   opacity: 0;
-  transform: translate3d(0, 20px, 0);
-  transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1);
-  will-change: transform;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1);
+  will-change: transform, opacity;
 }
 .intro-hero-el.visible { opacity: 1; transform: translate3d(0, 0, 0); }
 
