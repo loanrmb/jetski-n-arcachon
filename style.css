@@ -1312,6 +1312,14 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
 ════════════════════════════════ */
 @media (max-width: 768px) {
 
+  /* ── Global: prevent any element from causing horizontal overflow ── */
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  * { max-width: 100%; }
+  /* Exceptions: carousel track must be wider than viewport for infinite loop;
+     tabs inner must overflow for horizontal scroll */
+  .carousel-track,
+  .mt-tabs-inner { max-width: none; }
+
   /* ── Nav: hide the Réserver btn inside the nav bar on mobile
         (it's still accessible in the hamburger menu)         ── */
   .nav-links a.btn { display: none; }
@@ -1346,15 +1354,22 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   }
   .price-table-scroller { margin-top: 40px; }
   .pricing-cta .btn { width: 100%; max-width: 340px; min-height: 52px; }
-  /* Equal-width columns (table-layout: fixed equivalent for Grid) */
-  .pt-row { grid-template-columns: repeat(4, 1fr); }
-  /* All cells: compact, centered */
-  .pt-c { padding: 10px 6px; font-size: 0.78rem; align-items: center; justify-content: center; }
+  /* Identical column layout — header + data rows must match */
+  .pt-head,
+  .pt-row { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+  /* All cells: compact, centered, min-height for readability */
+  .pt-c { padding: 10px 6px; font-size: 0.78rem; align-items: center; justify-content: center; min-height: 52px; }
+  /* Override desktop header's flex-start alignment */
+  .pt-head .pt-c { align-items: center; }
   /* First column (model name): left-aligned, slightly smaller */
   .pt-c--name { font-size: 0.72rem; padding: 10px 4px; align-items: flex-start; justify-content: flex-start; }
   .pt-c--name b { font-size: 0.78rem; }
   /* Price values: bold */
   .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-weight: 600; }
+
+  /* ── Availability calendar: stack vertically, no overflow ── */
+  .avail-layout { grid-template-columns: 1fr; gap: 24px; }
+  .avail-card { width: 100%; max-width: 100%; overflow: hidden; }
 
   /* ── Carousel: hide arrows — swipe/touch handles nav ── */
   .carousel-arrow { display: none; }
