@@ -19,6 +19,95 @@ const MODELS = [
 // Must match slot_time values in the DB
 const SLOT_TIMES = ['09:00', '11:00', '14:00', '16:00'];
 
+// ── TIME PHASE ENGINE ──────────────────────────────────────────────────────
+
+function getTimePhase() {
+  const h = new Date().getHours();
+  if (h >= 21 || h < 7)  return 'night';
+  if (h >= 19)            return 'closing-soon';
+  if (h >= 17)            return 'late-afternoon';
+  if (h === 7 || h === 8) return 'opening-soon';
+  return 'open';
+}
+
+function getPhaseContent(phase) {
+  const h = new Date().getHours();
+  const openIn = 9 - h;
+
+  switch (phase) {
+    case 'night':
+      return {
+        eyebrow:  'On reprend demain à 9h 🌙',
+        availSub: 'Nos jets skis rentrent au port pour la nuit. Réservez dès maintenant votre créneau de demain — premier départ à 9h.',
+        heroBtn:  'Réserver pour demain',
+        nightMode: true,
+      };
+    case 'opening-soon':
+      return {
+        eyebrow:  `☀️ On ouvre dans ${openIn}h — réservez votre créneau du matin !`,
+        availSub: 'Les premiers créneaux du matin partent vite. Réservez maintenant pour être sur l\'eau dès 9h.',
+        heroBtn:  'Réserver ce matin',
+        nightMode: true,
+      };
+    case 'closing-soon':
+      return {
+        eyebrow:  '⏳ Derniers spots disponibles ce soir — on ferme à 21h.',
+        availSub: 'Il reste quelques créneaux pour aujourd\'hui. Après 21h, le prochain départ sera demain matin.',
+        heroBtn:  'Réserver maintenant',
+        nightMode: false,
+      };
+    case 'late-afternoon':
+      return {
+        eyebrow:  '🌅 Le soleil se couche dans quelques heures — profitez-en !',
+        availSub: 'Quelques créneaux restent disponibles en fin de journée. Le bassin en fin d\'après-midi, c\'est quelque chose.',
+        heroBtn:  'Voir les disponibilités',
+        nightMode: false,
+      };
+    default: // open
+      return {
+        eyebrow:  'Bassin d\'Arcachon · Gironde · Mai – Septembre',
+        availSub: null, // keep original HTML text
+        heroBtn:  'Choisir un modèle',
+        nightMode: false,
+      };
+  }
+}
+
+function applyTheme() {
+  const phase   = getTimePhase();
+  const content = getPhaseContent(phase);
+
+  // ── Toggle dark mode with smooth transition ──────────────────
+  const isDark = content.nightMode;
+  const body   = document.body;
+
+  if (isDark !== body.classList.contains('night-mode')) {
+    body.classList.add('theme-changing');
+    body.classList.toggle('night-mode', isDark);
+    setTimeout(() => body.classList.remove('theme-changing'), 1400);
+  }
+
+  // ── Update hero eyebrow ──────────────────────────────────────
+  const eyebrow = document.querySelector('.intro .eyebrow');
+  if (eyebrow) eyebrow.textContent = content.eyebrow;
+
+  // ── Update hero CTA button ───────────────────────────────────
+  const heroBtn = document.querySelector('.btn.intro-hero-el');
+  if (heroBtn) heroBtn.textContent = content.heroBtn;
+
+  // ── Update availability subtitle ─────────────────────────────
+  if (content.availSub) {
+    const availSub = document.querySelector('.avail-text .sec-sub');
+    if (availSub) availSub.innerHTML = content.availSub;
+  }
+
+  // ── Update weather icon for night ────────────────────────────
+  const weatherIcon = document.getElementById('weatherIcon');
+  if (weatherIcon && isDark) {
+    weatherIcon.innerHTML = '<span style="font-size:56px;line-height:1">🌙</span>';
+  }
+}
+
 const MONTHS_FR = [
   'Janvier','Février','Mars','Avril','Mai','Juin',
   'Juillet','Août','Septembre','Octobre','Novembre','Décembre',
@@ -668,6 +757,10 @@ async function init() {
 
 init();
 
+// Time-based theme — run immediately then every 60s
+applyTheme();
+setInterval(applyTheme, 60_000);
+
 // ── STAGGER RAF — timestamp-based, 160Hz-safe
 function staggerRAF(elements, msPerStep, onReveal) {
   if (!elements.length) return;
@@ -895,39 +988,6 @@ setTimeout(() => {
       const temp = Math.round(c.temperature_2m);
       const wind = Math.round(c.windspeed_10m);
       const code = c.weathercode;
-
-      // ── Night mode: override display after sunset ─────────────────
-      const sunsetStr  = data.daily?.sunset?.[0];   // "2026-05-24T21:38"
-      const sunriseStr = data.daily?.sunrise?.[0];  // "2026-05-24T06:17"
-      const now        = new Date();
-      const sunset     = sunsetStr  ? new Date(sunsetStr)  : null;
-      const sunrise    = sunriseStr ? new Date(sunriseStr) : null;
-      const isNight    = sunset && sunrise
-        ? (now >= sunset || now < sunrise)
-        : now.getHours() >= 22 || now.getHours() < 7; // fallback
-
-      if (isNight) {
-        // Override weather icon to moon
-        document.getElementById('weatherIcon').innerHTML =
-          '<span style="font-size:56px;line-height:1">🌙</span>';
-
-        // Show "À demain" badge in hero eyebrow
-        const eyebrow = document.querySelector('.intro .eyebrow');
-        if (eyebrow) {
-          eyebrow.textContent = 'On reprend demain matin 🌙  ·  Réservez dès maintenant';
-        }
-
-        // Soft night message in availability section subtitle
-        const availSub = document.querySelector('.avail-text .sec-sub');
-        if (availSub) {
-          availSub.innerHTML =
-            'Nos jets skis rentrent au port après le coucher du soleil. ' +
-            'Vous pouvez dès maintenant réserver un créneau pour demain — ' +
-            'premier départ à 9h.';
-        }
-
-        return; // Skip rest of weather rendering (no forecast needed at night)
-      }
 
       // ① Conditions actuelles
       document.getElementById('weatherIcon').innerHTML = '<span style="font-size:56px;line-height:1">' + emojiForCode(code) + '</span>';
