@@ -57,6 +57,7 @@ export function ReservationCalendar() {
   const [showDetail, setShowDetail]     = useState(false)
   const [showForm, setShowForm]         = useState(false)
   const [filterModel, setFilterModel]   = useState<string | null>(null)
+  const [hideCancelled, setHideCancelled] = useState(true)
   const [newSlot, setNewSlot]           = useState<{ date: string; time: string } | null>(null)
   const [loading, setLoading]           = useState(true)
   const calendarRef = useRef<FullCalendar>(null)
@@ -81,6 +82,33 @@ export function ReservationCalendar() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
+  }, [fetchReservations])
+
+  // ── Auto-transition confirmed → in_progress when slot time is reached ──
+  useEffect(() => {
+    async function autoTransition() {
+      const now   = new Date()
+      const today = now.toISOString().split('T')[0]
+      const pad   = (n: number) => String(n).padStart(2, '0')
+      const hhmm  = (d: Date)   => `${pad(d.getHours())}:${pad(d.getMinutes())}`
+
+      const current   = hhmm(now)
+      const thirtyAgo = hhmm(new Date(now.getTime() - 30 * 60 * 1000))
+
+      const { error } = await supabase
+        .from('reservations')
+        .update({ status: 'in_progress', updated_at: new Date().toISOString() })
+        .eq('status', 'confirmed')
+        .eq('date', today)
+        .lte('slot_time', current)
+        .gte('slot_time', thirtyAgo)
+
+      if (!error) fetchReservations()
+    }
+
+    autoTransition()
+    const timer = setInterval(autoTransition, 5 * 60 * 1000)
+    return () => clearInterval(timer)
   }, [fetchReservations])
 
   // ── Event click → open full detail directly ───────────────────
@@ -125,10 +153,15 @@ export function ReservationCalendar() {
     fetchReservations()
   }
 
-  const events = (filterModel
-    ? reservations.filter(r => r.jet_ski?.name === filterModel)
-    : reservations
-  ).map(reservationToEvent)
+  const events = reservations
+    .filter(r => {
+      // Fix 1: match on resolved model name (handles jet_ski_id=null online bookings)
+      if (filterModel && (r.requested_jet_ski ?? r.jet_ski?.name) !== filterModel) return false
+      // Fix 3: hide cancelled + no_show when toggle is on
+      if (hideCancelled && (r.status === 'cancelled' || r.status === 'no_show')) return false
+      return true
+    })
+    .map(reservationToEvent)
 
   return (
     <>
@@ -145,7 +178,7 @@ export function ReservationCalendar() {
         ))}
       </div>
 
-      {/* ── Model filter tabs ── */}
+      {/* ── Model filter tabs + hide-cancelled toggle ── */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button
           onClick={() => setFilterModel(null)}
@@ -177,6 +210,17 @@ export function ReservationCalendar() {
             {name}
           </button>
         ))}
+
+        {/* Hide cancelled/no-show toggle — right-aligned */}
+        <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer select-none ml-auto">
+          <input
+            type="checkbox"
+            checked={hideCancelled}
+            onChange={e => setHideCancelled(e.target.checked)}
+            className="h-4 w-4 rounded accent-slate-700 cursor-pointer"
+          />
+          Masquer les annulées
+        </label>
       </div>
 
       {/* ── Calendar ── */}
