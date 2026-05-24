@@ -815,7 +815,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
         mtRevealEls.forEach(el => el.classList.add('mt-visible'));
         modelsObs.disconnect();
       }
-    }, { threshold: 0.15 });
+    }, { threshold: 0.4, rootMargin: '0px 0px -80px 0px' });
     modelsObs.observe(modelsSection);
   }
 
