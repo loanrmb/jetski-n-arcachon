@@ -77,6 +77,7 @@ async function fetchBlocked() {
       `${r.blocked_date}|${String(r.blocked_slot).slice(0, 5)}|${r.blocked_jet_ski_id}`
     )
   );
+  console.log('[blockedSet]', [...blockedSet]);
 }
 
 // ── AVAILABILITY HELPERS
