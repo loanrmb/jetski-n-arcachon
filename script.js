@@ -52,9 +52,10 @@ let blockedSet = new Set(); // "YYYY-MM-DD|HH:MM|jet_ski_id"
 // ── SUPABASE — DATA LAYER
 
 async function fetchJetSkis() {
-  // Order by power_hp ASC so jetSkis[0/1/2] aligns with MODELS[0/1/2] (cheapest→fastest).
-  const { data } = await sb.from('jet_skis').select('id,name,power_hp')
+  // Only fetch active + booking-enabled jet skis, ordered by power_hp ASC for stable ordering.
+  const { data } = await sb.from('jet_skis').select('id,name,power_hp,booking_enabled')
     .eq('status', 'active')
+    .eq('booking_enabled', true)
     .order('power_hp', { ascending: true });
   jetSkis   = data ?? [];
   jetSkiIds = jetSkis.map(r => r.id);
@@ -292,16 +293,19 @@ function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
 function renderTimeSlots() {
   if (!selectedDate) return; // nothing to render without a date
 
-  // Map the selected model to its specific jet ski UUID.
-  // MODELS[] and jetSkis[] share the same cheapest→fastest order (fetchJetSkis orders by power_hp ASC).
-  // This lets us check per-jet-ski blocking rather than all-or-nothing.
-  const modelIdx   = MODELS.findIndex(m => m.dbName === selectedJetSki);
-  const selectedId = modelIdx >= 0 ? (jetSkis[modelIdx]?.id ?? null) : null;
+  // Match by name (not index) so that booking_enabled=false models absent from jetSkis[]
+  // are correctly detected as unavailable rather than silently mapping to the wrong jet ski.
+  const jetSki     = jetSkis.find(j => j.name === selectedJetSki);
+  const selectedId = jetSki?.id ?? null;
+
+  // Model selected but missing from jetSkis[] → booking_enabled=false (or deactivated).
+  // Disable every slot so the user can't book it.
+  const modelUnavailable = !!selectedJetSki && !jetSki;
 
   document.querySelectorAll('.tslot').forEach(btn => {
     const slot = btn.dataset.t;
-    let full = false;
-    if (selectedDate) {
+    let full = modelUnavailable;
+    if (!full) {
       // Per-jet-ski check when we know the exact model; all-skis fallback otherwise.
       full = selectedId
         ? blockedSet.has(`${selectedDate}|${slot}|${selectedId}`)
@@ -309,7 +313,7 @@ function renderTimeSlots() {
     }
     btn.disabled = full;
     btn.classList.toggle('tslot--disabled', full);
-    // If the currently-selected slot just became full, deselect it
+    // If the currently-selected slot just became unavailable, deselect it
     if (full && selectedTime === slot) {
       selectedTime = null;
       btn.classList.remove('sel');

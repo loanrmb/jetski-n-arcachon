@@ -9,26 +9,28 @@ import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import { createClient } from '@/lib/supabase/client'
-import { slotEndTime, STATUS_EVENT_COLOR, STATUS_EVENT_BORDER, hexRgba, formatTime } from '@/lib/utils'
-import { STATUS_LABELS, type Reservation, type JetSki, type ReservationStatus } from '@/types'
+import { slotEndTime, STATUS_BADGE, hexRgba } from '@/lib/utils'
+import { STATUS_LABELS, type ReservationStatus } from '@/types'
 import { ReservationDetailClient } from '@/components/reservations/reservation-detail-client'
 import { ReservationForm } from '@/components/reservations/reservation-form'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
-import { StatusBadge } from '@/components/reservations/status-badge'
-import { ExternalLink, Save } from 'lucide-react'
 import type { ReservationWithJoins } from '@/components/reservations/reservation-detail'
 
-// Statuses that should appear dimmed in the calendar
+// Statuses that appear dimmed (greyed out) in the calendar
 const DIMMED = new Set<ReservationStatus>(['completed', 'cancelled', 'no_show'])
 
+// Jet ski models — used for filter tabs and legend
+const JET_SKI_MODELS = [
+  { name: 'GTI SE 130', color: '#3B82F6' },
+  { name: 'GTX 230',    color: '#10B981' },
+  { name: 'RXT-X 300',  color: '#EF4444' },
+]
+
 function reservationToEvent(r: ReservationWithJoins): EventInput {
-  const endTime = slotEndTime(r.slot_time, Number(r.duration_hours))
-  const hex     = STATUS_EVENT_COLOR[r.status]  ?? '#94A3B8'
-  const border  = STATUS_EVENT_BORDER[r.status] ?? '#64748B'
+  const endTime  = slotEndTime(r.slot_time, Number(r.duration_hours))
+  const hex      = r.jet_ski?.color ?? '#94A3B8'
   const isDimmed = DIMMED.has(r.status)
 
   return {
@@ -36,8 +38,8 @@ function reservationToEvent(r: ReservationWithJoins): EventInput {
     title:           `${r.client?.first_name ?? ''} ${r.client?.last_name ?? ''}`,
     start:           `${r.date}T${r.slot_time}`,
     end:             `${r.date}T${endTime}`,
-    backgroundColor: isDimmed ? hexRgba(hex, 0.45) : hex,
-    borderColor:     isDimmed ? hexRgba(border, 0.55) : border,
+    backgroundColor: isDimmed ? hexRgba(hex, 0.40) : hex,
+    borderColor:     isDimmed ? hexRgba(hex, 0.50) : hex,
     textColor:       isDimmed ? '#64748B' : '#ffffff',
     extendedProps:   { reservation: r },
   }
@@ -48,9 +50,7 @@ export function ReservationCalendar() {
   const [selectedRes, setSelectedRes]   = useState<ReservationWithJoins | null>(null)
   const [showDetail, setShowDetail]     = useState(false)
   const [showForm, setShowForm]         = useState(false)
-  const [showQuickNote, setShowQuickNote] = useState(false)
-  const [quickNoteText, setQuickNoteText] = useState('')
-  const [savingNote, setSavingNote]     = useState(false)
+  const [filterModel, setFilterModel]   = useState<string | null>(null)
   const [newSlot, setNewSlot]           = useState<{ date: string; time: string } | null>(null)
   const [loading, setLoading]           = useState(true)
   const calendarRef = useRef<FullCalendar>(null)
@@ -77,34 +77,11 @@ export function ReservationCalendar() {
     return () => { supabase.removeChannel(channel) }
   }, [fetchReservations])
 
-  // ── Event click → quick note popover ─────────────────────────
+  // ── Event click → open full detail directly ───────────────────
   function handleEventClick(info: EventClickArg) {
     const r = info.event.extendedProps.reservation as ReservationWithJoins
     setSelectedRes(r)
-    setQuickNoteText(r.internal_note ?? '')
-    setShowQuickNote(true)
-  }
-
-  function openFullDetail() {
-    setShowQuickNote(false)
     setShowDetail(true)
-  }
-
-  async function saveQuickNote() {
-    if (!selectedRes) return
-    setSavingNote(true)
-    const { error } = await supabase
-      .from('reservations')
-      .update({ internal_note: quickNoteText, updated_at: new Date().toISOString() })
-      .eq('id', selectedRes.id)
-
-    if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
-    } else {
-      toast({ title: 'Note sauvegardée', variant: 'success' })
-      fetchReservations()
-    }
-    setSavingNote(false)
   }
 
   function handleDateClick(info: DateClickArg) {
@@ -142,28 +119,56 @@ export function ReservationCalendar() {
     fetchReservations()
   }
 
-  const events = reservations.map(reservationToEvent)
+  const events = (filterModel
+    ? reservations.filter(r => r.jet_ski?.name === filterModel)
+    : reservations
+  ).map(reservationToEvent)
 
   return (
     <>
-      {/* ── Legend ── */}
-      <div className="flex flex-wrap gap-x-5 gap-y-2 mb-4 text-xs text-slate-600">
-        {(Object.entries(STATUS_EVENT_COLOR) as [ReservationStatus, string][]).map(([status, color]) => (
-          <span key={status} className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-sm shrink-0" style={{ backgroundColor: color }} />
+      {/* ── Status legend ── */}
+      <div className="flex flex-wrap gap-x-3 gap-y-2 mb-3 text-xs">
+        {(Object.entries(STATUS_BADGE) as [ReservationStatus, string][]).map(([status, cls]) => (
+          <span
+            key={status}
+            className={`inline-flex items-center rounded px-1.5 py-0.5 border font-medium ${cls}`}
+          >
             {STATUS_LABELS[status]}
           </span>
         ))}
-        <span className="ml-4 text-slate-400">|</span>
-        {[
-          { label: 'GTI SE 130', color: '#3B82F6' },
-          { label: 'GTX 230',    color: '#10B981' },
-          { label: 'RXT-X 300',  color: '#EF4444' },
-        ].map(({ label, color }) => (
-          <span key={label} className="flex items-center gap-1 text-slate-400">
-            <span className="h-2 w-2 rounded-full inline-block" style={{ backgroundColor: color }} />
-            {label}
-          </span>
+      </div>
+
+      {/* ── Model filter tabs ── */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <button
+          onClick={() => setFilterModel(null)}
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            filterModel === null
+              ? 'bg-slate-800 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          Tous
+        </button>
+        {JET_SKI_MODELS.map(({ name, color }) => (
+          <button
+            key={name}
+            onClick={() => setFilterModel(filterModel === name ? null : name)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              filterModel === name
+                ? 'text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+            style={filterModel === name ? { backgroundColor: color } : undefined}
+          >
+            <span
+              className="inline-block h-2 w-2 rounded-full shrink-0"
+              style={{
+                backgroundColor: filterModel === name ? 'rgba(255,255,255,0.75)' : color,
+              }}
+            />
+            {name}
+          </button>
         ))}
       </div>
 
@@ -221,74 +226,6 @@ export function ReservationCalendar() {
         )}
       </div>
 
-      {/* ── Quick note popover (compact dialog) ── */}
-      <Dialog open={showQuickNote} onOpenChange={open => {
-        setShowQuickNote(open)
-        if (!open) { setSelectedRes(null); setQuickNoteText('') }
-      }}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-base">
-              {selectedRes?.jet_ski && (
-                <span
-                  className="h-2.5 w-2.5 rounded-full inline-block shrink-0"
-                  style={{ backgroundColor: selectedRes.jet_ski.color }}
-                />
-              )}
-              {selectedRes?.client?.first_name} {selectedRes?.client?.last_name}
-            </DialogTitle>
-          </DialogHeader>
-
-          {selectedRes && (
-            <div className="space-y-3">
-              {/* Quick info */}
-              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <StatusBadge status={selectedRes.status} />
-                <span>·</span>
-                <span>{formatTime(selectedRes.slot_time)}</span>
-                <span>·</span>
-                <span>{selectedRes.jet_ski?.name ?? '—'}</span>
-              </div>
-
-              {/* Quick note */}
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-600">Note rapide</p>
-                <Textarea
-                  rows={3}
-                  value={quickNoteText}
-                  onChange={e => setQuickNoteText(e.target.value)}
-                  placeholder="Note interne staff…"
-                  className="text-sm resize-none"
-                  autoFocus
-                />
-              </div>
-
-              <div className="flex items-center justify-between gap-2">
-                <Button
-                  size="sm"
-                  variant="accent"
-                  disabled={savingNote}
-                  onClick={saveQuickNote}
-                  className="gap-1.5"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  {savingNote ? 'Sauvegarde…' : 'Sauvegarder'}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={openFullDetail}
-                  className="gap-1.5 text-muted-foreground"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Ouvrir la fiche complète
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
       {/* ── Full reservation detail modal ── */}
       <Dialog open={showDetail} onOpenChange={open => {
         setShowDetail(open)
@@ -299,7 +236,7 @@ export function ReservationCalendar() {
             <DialogTitle className="flex items-center gap-2">
               {selectedRes?.jet_ski && (
                 <span
-                  className="h-3 w-3 rounded-full inline-block"
+                  className="h-3 w-3 rounded-full inline-block shrink-0"
                   style={{ backgroundColor: selectedRes.jet_ski.color }}
                 />
               )}
@@ -339,21 +276,28 @@ export function ReservationCalendar() {
 }
 
 function renderEventContent(eventInfo: { event: { extendedProps: { reservation: ReservationWithJoins } } }) {
-  const r = eventInfo.event.extendedProps.reservation
+  const r      = eventInfo.event.extendedProps.reservation
+  const badgeCls = STATUS_BADGE[r.status] ?? 'bg-slate-100 text-slate-600 border-slate-300'
+  const label    = STATUS_LABELS[r.status] ?? r.status
+
   return (
-    <div className="px-1 py-0.5 overflow-hidden leading-tight text-[11px]">
-      <p className="font-semibold truncate">
-        {r.client?.first_name} {r.client?.last_name}
-      </p>
-      <p className="opacity-90 flex items-center gap-1 truncate">
+    <div className="px-1 py-0.5 overflow-hidden leading-tight text-[11px] space-y-0.5">
+      {/* Line 1: model color dot + model short name */}
+      <p className="font-semibold truncate flex items-center gap-1">
         {r.jet_ski && (
           <span
-            className="inline-block h-1.5 w-1.5 rounded-full shrink-0"
+            className="inline-block h-1.5 w-1.5 rounded-full shrink-0 ring-1 ring-white/40"
             style={{ backgroundColor: r.jet_ski.color }}
           />
         )}
-        {r.jet_ski?.name}
+        <span className="truncate">{r.jet_ski?.name ?? '—'}</span>
       </p>
+      {/* Line 2: client first name */}
+      <p className="truncate">{r.client?.first_name ?? ''}</p>
+      {/* Line 3: status badge pill */}
+      <span className={`inline-flex items-center rounded px-1 py-px text-[10px] font-medium border ${badgeCls}`}>
+        {label}
+      </span>
     </div>
   )
 }

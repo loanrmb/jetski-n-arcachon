@@ -17,19 +17,23 @@ import { Phone, Mail, Users, Euro, FileText, ShieldCheck, AlertTriangle } from '
 
 export type ReservationWithJoins = Reservation & { jet_ski?: JetSki; client?: Client }
 
-// Regular status-flow transitions (no_show uses dedicated button below)
+// Status-flow transitions — every status has an escape hatch
 const NEXT_STATUS: Partial<Record<ReservationStatus, ReservationStatus[]>> = {
   pending:     ['confirmed', 'cancelled'],
   confirmed:   ['in_progress', 'cancelled'],
-  in_progress: ['completed'],
-  completed:   [],
-  cancelled:   [],
+  in_progress: ['completed', 'cancelled'],
+  // Escape hatches: completed can be cancelled (refund/dispute); cancelled can be reinstated
+  completed:   ['cancelled'],
+  cancelled:   ['confirmed'],
   // Post no-show: allow correcting to confirmed / cancelled / completed
   no_show:     ['confirmed', 'cancelled', 'completed'],
 }
 
 // Statuses where the dedicated "Marquer No-show" button appears
 const NO_SHOW_ELIGIBLE = new Set<ReservationStatus>(['confirmed', 'in_progress'])
+
+// Statuses that trigger the email confirmation dialog
+const EMAIL_STATUSES = new Set<ReservationStatus>(['confirmed', 'cancelled'])
 
 interface ReservationDetailProps {
   reservation: ReservationWithJoins
@@ -44,6 +48,8 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
   const [savingNotes, setSavingNotes]       = useState(false)
   const [changingStatus, setChangingStatus] = useState<ReservationStatus | null>(null)
   const [noShowOpen, setNoShowOpen]         = useState(false)
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
+  const [pendingStatus, setPendingStatus]     = useState<ReservationStatus | null>(null)
   const supabase = createClient()
 
   async function changeStatus(newStatus: ReservationStatus) {
@@ -69,6 +75,34 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
       onUpdate()
     }
     setChangingStatus(null)
+  }
+
+  // ── Intercept status clicks — show email dialog for confirmed/cancelled ──
+  function handleStatusClick(ns: ReservationStatus) {
+    if (EMAIL_STATUSES.has(ns) && r.client?.email) {
+      setPendingStatus(ns)
+      setEmailDialogOpen(true)
+    } else {
+      changeStatus(ns)
+    }
+  }
+
+  async function applyEmailDialog(shouldSendEmail: boolean) {
+    setEmailDialogOpen(false)
+    if (!pendingStatus) return
+    if (shouldSendEmail) {
+      // TODO: wire to Resend via /api/notifications when ready
+      console.log('EMAIL_QUEUED', {
+        to:            r.client?.email,
+        status:        pendingStatus,
+        reservationId: r.id,
+        client:        `${r.client?.first_name ?? ''} ${r.client?.last_name ?? ''}`.trim(),
+        date:          r.date,
+        slot:          r.slot_time,
+      })
+    }
+    await changeStatus(pendingStatus)
+    setPendingStatus(null)
   }
 
   async function confirmNoShow() {
@@ -114,7 +148,7 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
             size="sm"
             variant={isDestructive(ns) ? 'outline' : 'accent'}
             className={isDestructive(ns) ? 'text-red-600 border-red-200 hover:bg-red-50' : ''}
-            onClick={() => changeStatus(ns)}
+            onClick={() => handleStatusClick(ns)}
             disabled={changingStatus !== null}
           >
             {changingStatus === ns ? (
@@ -270,6 +304,38 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
           {savingNotes ? 'Sauvegarde…' : 'Sauvegarder les notes'}
         </Button>
       </div>
+
+      {/* ── Email confirmation dialog ── */}
+      <Dialog open={emailDialogOpen} onOpenChange={open => {
+        if (!open) { setEmailDialogOpen(false); setPendingStatus(null) }
+      }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-blue-500" />
+              Envoyer un email au client ?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {pendingStatus === 'confirmed'
+              ? `Informer ${r.client?.first_name ?? 'le client'} que sa réservation est confirmée.`
+              : `Informer ${r.client?.first_name ?? 'le client'} que sa réservation est annulée.`
+            }
+          </p>
+          {r.client?.email && (
+            <p className="text-xs text-muted-foreground font-mono">→ {r.client.email}</p>
+          )}
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => applyEmailDialog(false)}>
+              Ne pas envoyer
+            </Button>
+            <Button variant="accent" onClick={() => applyEmailDialog(true)} className="gap-1.5">
+              <Mail className="h-3.5 w-3.5" />
+              Envoyer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* ── No-show confirmation dialog ── */}
       <Dialog open={noShowOpen} onOpenChange={setNoShowOpen}>
