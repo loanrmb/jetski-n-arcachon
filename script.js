@@ -950,7 +950,6 @@ setTimeout(() => {
       if (isNight) {
         document.getElementById('weatherIcon').innerHTML =
           '<span style="font-size:56px;line-height:1">🌙</span>';
-        return;
       }
 
       // ① Conditions actuelles
