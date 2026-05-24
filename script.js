@@ -77,7 +77,6 @@ async function fetchBlocked() {
       `${r.blocked_date}|${String(r.blocked_slot).slice(0, 5)}|${r.blocked_jet_ski_id}`
     )
   );
-  console.log('[blockedSet]', [...blockedSet]);
 }
 
 // ── AVAILABILITY HELPERS
@@ -102,7 +101,7 @@ function setupRealtime() {
   // Availabilities — all events (manual blocks added/removed by staff)
   sb.channel('site-availabilities')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'availabilities' }, onLiveUpdate)
-    .subscribe((status) => console.log('[realtime] availabilities channel:', status));
+    .subscribe();
 
   // Reservations — explicit INSERT / UPDATE / DELETE listeners.
   // '*' was not reliably firing for UPDATE; explicit event types are.
@@ -113,16 +112,13 @@ function setupRealtime() {
     )
     .on('postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'reservations' },
-      (payload) => {
-        console.log('[realtime] reservation updated', payload.new?.status);
-        onLiveUpdate();
-      }
+      () => onLiveUpdate()
     )
     .on('postgres_changes',
       { event: 'DELETE', schema: 'public', table: 'reservations' },
       () => onLiveUpdate()
     )
-    .subscribe((status) => console.log('[realtime] reservations channel:', status));
+    .subscribe();
 }
 
 async function onLiveUpdate() {
@@ -301,7 +297,6 @@ function renderTimeSlots() {
   // This lets us check per-jet-ski blocking rather than all-or-nothing.
   const modelIdx   = MODELS.findIndex(m => m.dbName === selectedJetSki);
   const selectedId = modelIdx >= 0 ? (jetSkis[modelIdx]?.id ?? null) : null;
-  console.log('[slot-check]', selectedJetSki, modelIdx, jetSkis[modelIdx]?.id);
 
   document.querySelectorAll('.tslot').forEach(btn => {
     const slot = btn.dataset.t;
