@@ -58,21 +58,21 @@ async function fetchJetSkis() {
 }
 
 // Fetch all blocked slots from today → +1 year (covers the full next season).
+// Uses a SECURITY DEFINER RPC that UNIONs:
+//   ① availabilities.is_blocked = true  (manual blocks)
+//   ② reservations status IN ('confirmed','in_progress')
 // Supabase TIME columns arrive as "HH:MM:SS" — slice to 5 for "HH:MM".
 async function fetchBlocked() {
   const from = TODAY.toISOString().split('T')[0];
   const to   = new Date(TODAY.getFullYear() + 1, TODAY.getMonth(), TODAY.getDate())
                  .toISOString().split('T')[0];
 
-  const { data } = await sb
-    .from('availabilities')
-    .select('date,slot_time,jet_ski_id')
-    .eq('is_blocked', true)
-    .gte('date', from)
-    .lte('date', to);
+  const { data } = await sb.rpc('public_blocked_slots', { from_date: from, to_date: to });
 
   blockedSet = new Set(
-    (data ?? []).map(r => `${r.date}|${r.slot_time.slice(0, 5)}|${r.jet_ski_id}`)
+    (data ?? []).map(r =>
+      `${r.blocked_date}|${String(r.blocked_slot).slice(0, 5)}|${r.blocked_jet_ski_id}`
+    )
   );
 }
 
