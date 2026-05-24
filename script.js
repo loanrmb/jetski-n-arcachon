@@ -803,6 +803,22 @@ function staggerRAF(elements, msPerStep, onReveal) {
     locObs.observe(locMap);
   }
 
+  // Models section — entrance animation (active slide only, once)
+  const modelsSection = document.querySelector('.models');
+  const mtRevealEls   = Array.from(document.querySelectorAll('.mt-reveal'));
+  if (modelsSection && mtRevealEls.length) {
+    let modelsDone = false;
+    const modelsObs = new IntersectionObserver((entries) => {
+      if (modelsDone) return;
+      if (entries.some(e => e.isIntersecting)) {
+        modelsDone = true;
+        mtRevealEls.forEach(el => el.classList.add('mt-visible'));
+        modelsObs.disconnect();
+      }
+    }, { threshold: 0.15 });
+    modelsObs.observe(modelsSection);
+  }
+
   // Airport flip — price cells (left-to-right, row-by-row, 80ms stagger)
   const ptFlipCells = Array.from(
     document.querySelectorAll('.pt-row:not(.pt-head) .pt-c:not(.pt-c--name)')
@@ -814,9 +830,9 @@ function staggerRAF(elements, msPerStep, onReveal) {
       entries.forEach(e => {
         if (e.isIntersecting && !ptFlipDone) {
           ptFlipDone = true;
-          const total = ptFlipCells.length;
-          let revealed = 0;
-          staggerRAF(ptFlipCells, 80, el => {
+          const incDone = incCards.every(c => c.classList.contains('visible'));
+          const delay   = incDone ? 0 : 400;
+          setTimeout(() => staggerRAF(ptFlipCells, 80, el => {
             el.classList.add('visible');
             el.style.willChange = 'auto';
             revealed++;
@@ -825,7 +841,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
               const pt = document.querySelector('.price-table');
               if (pt) pt.style.perspective = 'none';
             }
-          });
+          }), delay);
           ptFlipObs.disconnect();
         }
       });
