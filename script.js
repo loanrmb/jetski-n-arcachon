@@ -842,7 +842,7 @@ setTimeout(() => {
     'https://api.open-meteo.com/v1/forecast' +
     '?latitude=44.66&longitude=-1.17' +
     '&current=temperature_2m,windspeed_10m,weathercode' +
-    '&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max' +
+    '&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset' +
     '&wind_speed_unit=kn&forecast_days=5&timezone=Europe%2FParis';
 
   const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -1032,6 +1032,39 @@ setTimeout(() => {
       const wind = Math.round(c.windspeed_10m);
       const code = c.weathercode;
 
+      // ── Night mode: override display after sunset ─────────────────
+      const sunsetStr  = data.daily?.sunset?.[0];   // "2026-05-24T21:38"
+      const sunriseStr = data.daily?.sunrise?.[0];  // "2026-05-24T06:17"
+      const now        = new Date();
+      const sunset     = sunsetStr  ? new Date(sunsetStr)  : null;
+      const sunrise    = sunriseStr ? new Date(sunriseStr) : null;
+      const isNight    = sunset && sunrise
+        ? (now >= sunset || now < sunrise)
+        : now.getHours() >= 22 || now.getHours() < 7; // fallback
+
+      if (isNight) {
+        // Override weather icon to moon
+        document.getElementById('weatherIcon').innerHTML =
+          '<span style="font-size:56px;line-height:1">🌙</span>';
+
+        // Show "À demain" badge in hero eyebrow
+        const eyebrow = document.querySelector('.intro .eyebrow');
+        if (eyebrow) {
+          eyebrow.textContent = 'On reprend demain matin 🌙  ·  Réservez dès maintenant';
+        }
+
+        // Soft night message in availability section subtitle
+        const availSub = document.querySelector('.avail-text .sec-sub');
+        if (availSub) {
+          availSub.innerHTML =
+            'Nos jets skis rentrent au port après le coucher du soleil. ' +
+            'Vous pouvez dès maintenant réserver un créneau pour demain — ' +
+            'premier départ à 9h.';
+        }
+
+        return; // Skip rest of weather rendering (no forecast needed at night)
+      }
+
       // ① Conditions actuelles
       document.getElementById('weatherIcon').innerHTML = '<span style="font-size:56px;line-height:1">' + emojiForCode(code) + '</span>';
       document.getElementById('weatherTemp').textContent = temp;
@@ -1127,6 +1160,21 @@ setTimeout(() => {
     if (cur === TOTAL + 1)   snap(1);         // ghost first → real first
   });
 
+  /* Watchdog: every 800ms check the active slide is actually
+     visible. If not, re-snap to recover from lost transitionend
+     (tab switches, browser throttle, slow desktop image loads). */
+  setInterval(() => {
+    const active = track.querySelector('.cs-active');
+    if (!active) { snap(1); return; }
+    // If we're stuck on a ghost (idx 0 or TOTAL+1), recover
+    if (cur === 0)         { snap(TOTAL);   return; }
+    if (cur === TOTAL + 1) { snap(1);       return; }
+    // If active slide has near-zero opacity (transition stuck), re-snap
+    if (parseFloat(getComputedStyle(active).opacity) < 0.5) {
+      snap(cur);
+    }
+  }, 800);
+
   function slideNext() { go(cur + 1); }
   function slidePrev() { go(cur - 1); }
 
@@ -1143,14 +1191,14 @@ setTimeout(() => {
     });
   });
 
-  /* Safety net: if the active slide is still transparent 300ms after load,
-     re-snap to force correct opacity (catches slow-load edge cases) */
+  /* Safety net: if the active slide is still transparent 1200ms after load,
+     re-snap to force correct opacity (catches slow desktop image loads) */
   setTimeout(() => {
     const active = track.querySelector('.cs-active');
     if (active && parseFloat(getComputedStyle(active).opacity) < 0.5) {
       snap(cur);
     }
-  }, 300);
+  }, 1200);
 
   /* Arrows */
   prevBtn.addEventListener('click', () => { slidePrev(); startAuto(); });
