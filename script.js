@@ -795,88 +795,6 @@ setTimeout(() => {
 
   const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 
-  // ── SVG shapes (viewBox 0 0 48 48) — 7 types distincts ───────────
-  const SHAPES = {
-    // Code 0 — soleil plein
-    sun:
-      '<circle cx="24" cy="24" r="9" fill="#FBBF24"/>' +
-      '<g stroke="#FBBF24" stroke-width="3" stroke-linecap="round">' +
-        '<line x1="24" y1="4"    x2="24"  y2="10"/>' +
-        '<line x1="24" y1="38"   x2="24"  y2="44"/>' +
-        '<line x1="8.1" y1="8.1"   x2="12.3" y2="12.3"/>' +
-        '<line x1="35.7" y1="35.7" x2="39.9" y2="39.9"/>' +
-        '<line x1="4"  y1="24"   x2="10"  y2="24"/>' +
-        '<line x1="38" y1="24"   x2="44"  y2="24"/>' +
-        '<line x1="8.1"  y1="39.9" x2="12.3" y2="35.7"/>' +
-        '<line x1="35.7" y1="12.3" x2="39.9" y2="8.1"/>' +
-      '</g>',
-    // Codes 1–2 — soleil partiellement caché (nuage devant)
-    partly_cloudy:
-      '<circle cx="33" cy="17" r="7"  fill="#FBBF24"/>' +
-      '<g stroke="#FBBF24" stroke-width="2" stroke-linecap="round">' +
-        '<line x1="33" y1="5"  x2="33" y2="9"/>' +
-        '<line x1="44" y1="17" x2="40" y2="17"/>' +
-        '<line x1="40.8" y1="9.2" x2="38" y2="12"/>' +
-      '</g>' +
-      '<circle cx="18" cy="30" r="9"  fill="#94A3B8"/>' +
-      '<circle cx="30" cy="26" r="10" fill="#94A3B8"/>' +
-      '<rect x="9"  y="30" width="28" height="10" rx="5" fill="#94A3B8"/>',
-    // Code 3 — nuage seul, sans soleil
-    cloud:
-      '<circle cx="17" cy="27" r="9"  fill="#94A3B8"/>' +
-      '<circle cx="29" cy="22" r="11" fill="#94A3B8"/>' +
-      '<rect x="8"  y="27" width="30" height="11" rx="5.5" fill="#94A3B8"/>',
-    // Codes 45, 48 — brume/brouillard : nuage + lignes horizontales étagées
-    fog:
-      '<circle cx="17" cy="20" r="8"  fill="#94A3B8"/>' +
-      '<circle cx="28" cy="16" r="10" fill="#94A3B8"/>' +
-      '<rect x="9"  y="20" width="27" height="9" rx="4.5" fill="#94A3B8"/>' +
-      '<g stroke="#64748B" stroke-width="2.5" stroke-linecap="round">' +
-        '<line x1="8"  y1="34" x2="40" y2="34"/>' +
-        '<line x1="11" y1="40" x2="37" y2="40"/>' +
-        '<line x1="15" y1="46" x2="33" y2="46"/>' +
-      '</g>',
-    // Codes 51–67, 80–82 — nuage + gouttes bleues obliques
-    rain:
-      '<circle cx="18" cy="21" r="9"  fill="#64748B"/>' +
-      '<circle cx="30" cy="17" r="11" fill="#64748B"/>' +
-      '<rect x="9"  y="21" width="28" height="10" rx="5" fill="#64748B"/>' +
-      '<g stroke="#60A5FA" stroke-width="2.5" stroke-linecap="round">' +
-        '<line x1="16" y1="36" x2="14" y2="43"/>' +
-        '<line x1="24" y1="36" x2="22" y2="43"/>' +
-        '<line x1="32" y1="36" x2="30" y2="43"/>' +
-      '</g>',
-    // Codes 71–77 — nuage + croix neige (flocons stylisés)
-    snow:
-      '<circle cx="18" cy="21" r="9"  fill="#94A3B8"/>' +
-      '<circle cx="30" cy="17" r="11" fill="#94A3B8"/>' +
-      '<rect x="9"  y="21" width="28" height="10" rx="5" fill="#94A3B8"/>' +
-      '<g stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round">' +
-        '<line x1="13" y1="35" x2="13" y2="43"/>' +
-        '<line x1="9"  y1="39" x2="17" y2="39"/>' +
-        '<line x1="24" y1="35" x2="24" y2="43"/>' +
-        '<line x1="20" y1="39" x2="28" y2="39"/>' +
-        '<line x1="35" y1="35" x2="35" y2="43"/>' +
-        '<line x1="31" y1="39" x2="39" y2="39"/>' +
-      '</g>',
-    // Codes 95–99 — nuage sombre + éclair jaune
-    storm:
-      '<circle cx="18" cy="20" r="9"  fill="#475569"/>' +
-      '<circle cx="30" cy="16" r="11" fill="#475569"/>' +
-      '<rect x="9"  y="20" width="28" height="10" rx="5" fill="#475569"/>' +
-      '<polygon points="27,28 20,39 25,39 23,48 32,34 27,34" fill="#FCD34D"/>',
-  };
-
-  function shapeType(code) {
-    if (code === 0)                   return 'sun';
-    if (code <= 2)                    return 'partly_cloudy';
-    if (code === 3)                   return 'cloud';
-    if (code === 45 || code === 48)   return 'fog';
-    if (code >= 71 && code <= 77)     return 'snow';
-    if (code >= 95)                   return 'storm';
-    return 'rain'; // 51–67, 80–82
-  }
-
   function getCondition(windKn) {
     if (windKn < 10) return { label: 'Idéal pour naviguer',   cls: 'weather-badge--good' };
     if (windKn < 15) return { label: 'Conditions favorables', cls: 'weather-badge--ok' };
@@ -885,10 +803,10 @@ setTimeout(() => {
   }
 
   function emojiForCode(code) {
-    if (code === 0)                                                return '☀️';
-    if (code === 1)                                                return '🌤';
-    if (code === 2)                                                return '⛅';
-    if (code === 3)                                                return '☁️';
+    if (code === 0)                                                return '☀️';  // clear sky
+    if (code === 1)                                                return '☀️';  // mainly clear  → Apple shows sun
+    if (code === 2)                                                return '🌤';  // partly cloudy → Apple shows sun+cloud
+    if (code === 3)                                                return '⛅';  // overcast      → Apple shows clouds
     if (code === 45 || code === 48)                                return '🌫';
     if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '🌧';
     if (code >= 71 && code <= 77)                                  return '❄️';
