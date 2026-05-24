@@ -819,27 +819,24 @@ function staggerRAF(elements, msPerStep, onReveal) {
     modelsObs.observe(modelsSection);
   }
 
-  // Airport flip — price cells (left-to-right, row-by-row, 80ms stagger)
-  const ptFlipCells = Array.from(
-    document.querySelectorAll('.pt-row:not(.pt-head) .pt-c:not(.pt-c--name)')
+  // Pricing rows — lightweight row-by-row fade
+  const ptRows = Array.from(
+    document.querySelectorAll('.pt-row:not(.pt-head)')
   );
   const priceTable = document.querySelector('.price-table');
-  if (priceTable && ptFlipCells.length) {
-    let ptFlipDone = false;
-    const ptFlipObs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting && !ptFlipDone) {
-          ptFlipDone = true;
-          const incDone = incCards.every(c => c.classList.contains('visible'));
-          const delay   = incDone ? 0 : 400;
-          setTimeout(() => staggerRAF(ptFlipCells, 80, el => {
-            el.classList.add('visible');
-          }), delay);
-          ptFlipObs.disconnect();
-        }
-      });
+  if (priceTable && ptRows.length) {
+    let ptDone = false;
+    const ptObs = new IntersectionObserver((entries) => {
+      if (ptDone || !entries.some(e => e.isIntersecting)) return;
+      ptDone = true;
+      const incDone = incCards.every(c => c.classList.contains('visible'));
+      const delay   = incDone ? 0 : 400;
+      setTimeout(() => staggerRAF(ptRows, 150, el => {
+        el.classList.add('visible');
+      }), delay);
+      ptObs.disconnect();
     }, { threshold: 0.05 });
-    ptFlipObs.observe(priceTable);
+    ptObs.observe(priceTable);
   }
 })();
 
