@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
-import { Phone, Mail, Users, Euro, FileText, ShieldCheck, AlertTriangle } from 'lucide-react'
+import { Phone, Mail, Users, Euro, FileText, ShieldCheck, AlertTriangle, Trash2 } from 'lucide-react'
 
 export type ReservationWithJoins = Reservation & { jet_ski?: JetSki; client?: Client }
 
@@ -50,6 +50,8 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
   const [noShowOpen, setNoShowOpen]         = useState(false)
   const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const [pendingStatus, setPendingStatus]     = useState<ReservationStatus | null>(null)
+  const [deleteOpen, setDeleteOpen]           = useState(false)
+  const [deleting, setDeleting]               = useState(false)
   const supabase = createClient()
 
   async function changeStatus(newStatus: ReservationStatus) {
@@ -103,6 +105,23 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
     }
     await changeStatus(pendingStatus)
     setPendingStatus(null)
+  }
+
+  async function deleteReservation() {
+    setDeleting(true)
+    const { error } = await supabase
+      .from('reservations')
+      .delete()
+      .eq('id', r.id)
+
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
+      setDeleting(false)
+    } else {
+      toast({ title: 'Réservation supprimée', variant: 'success' })
+      onUpdate()
+      onClose()
+    }
   }
 
   async function confirmNoShow() {
@@ -304,6 +323,61 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
           {savingNotes ? 'Sauvegarde…' : 'Sauvegarder les notes'}
         </Button>
       </div>
+
+      {/* ── Danger zone ── */}
+      <Separator />
+      <div className="flex justify-end pt-1">
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+          onClick={() => setDeleteOpen(true)}
+          disabled={deleting || changingStatus !== null}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Supprimer la réservation
+        </Button>
+      </div>
+
+      {/* ── Delete confirmation dialog ── */}
+      <Dialog open={deleteOpen} onOpenChange={open => { if (!open) setDeleteOpen(false) }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-600" />
+              Supprimer la réservation ?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Supprimer définitivement cette réservation
+            {r.client ? ` de ${r.client.first_name} ${r.client.last_name}` : ''} ?
+            Cette action est irréversible.
+          </p>
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={deleteReservation}
+              disabled={deleting}
+              className="gap-1.5"
+            >
+              {deleting ? (
+                <>
+                  <span className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  Suppression…
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Supprimer
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Email confirmation dialog ── */}
       <Dialog open={emailDialogOpen} onOpenChange={open => {

@@ -303,6 +303,7 @@ export function ReservationCalendar() {
             <ReservationDetailClient
               reservation={selectedRes}
               onUpdate={handleDetailUpdate}
+              onClose={() => { setShowDetail(false); setSelectedRes(null) }}
             />
           )}
         </DialogContent>
@@ -326,26 +327,47 @@ export function ReservationCalendar() {
   )
 }
 
-function renderEventContent(eventInfo: { event: { extendedProps: { reservation: ReservationWithJoins } } }) {
+function renderEventContent(eventInfo: {
+  event: {
+    start:         Date | null
+    end:           Date | null
+    extendedProps: { reservation: ReservationWithJoins }
+  }
+}) {
   const r         = eventInfo.event.extendedProps.reservation
   const modelName = r.requested_jet_ski ?? r.jet_ski?.name ?? '—'
   const dotColor  = r.jet_ski?.color ?? '#6B7280'
   const label     = STATUS_LABELS[r.status] ?? r.status
 
+  // Hide the status label line when the block is ≤ 60 min tall — not enough room
+  const durationMins = eventInfo.event.end && eventInfo.event.start
+    ? (eventInfo.event.end.getTime() - eventInfo.event.start.getTime()) / 60000
+    : 60
+  const isShort = durationMins <= 60
+
   return (
-    <div className="px-1 py-0.5 overflow-hidden leading-tight text-[11px] space-y-0.5">
+    <div className="px-1 py-0.5 overflow-hidden leading-tight text-[11px]">
       {/* Line 1: model color dot + model name */}
-      <p className="truncate flex items-center gap-1">
+      <p className="flex items-center gap-1 overflow-hidden whitespace-nowrap">
         <span
           className="inline-block h-1.5 w-1.5 rounded-full shrink-0 ring-1 ring-white/40"
           style={{ backgroundColor: dotColor }}
         />
-        <span className="truncate">{modelName}</span>
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap">{modelName}</span>
       </p>
       {/* Line 2: client first name — bold */}
-      <p className="font-bold truncate">{r.client?.first_name ?? ''}</p>
-      {/* Line 3: status label — small, slightly transparent */}
-      <p className="truncate text-[10px]" style={{ opacity: 0.75 }}>{label}</p>
+      <p className="font-bold overflow-hidden text-ellipsis whitespace-nowrap">
+        {r.client?.first_name ?? ''}
+      </p>
+      {/* Line 3: status label — hidden on short (1h) blocks */}
+      {!isShort && (
+        <p
+          className="text-[10px] overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ opacity: 0.75 }}
+        >
+          {label}
+        </p>
+      )}
     </div>
   )
 }

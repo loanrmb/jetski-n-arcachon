@@ -16,9 +16,14 @@ interface Props {
    * Override with a client-side callback when rendered inside the calendar modal.
    */
   onUpdate?: () => void
+  /**
+   * Called when the detail should close (e.g. after deletion).
+   * Defaults to router.back(). Override when rendered inside a modal.
+   */
+  onClose?: () => void
 }
 
-export function ReservationDetailClient({ reservation, onUpdate }: Props) {
+export function ReservationDetailClient({ reservation, onUpdate, onClose }: Props) {
   const [editOpen, setEditOpen] = useState(false)
   const router = useRouter()
 
@@ -53,7 +58,7 @@ export function ReservationDetailClient({ reservation, onUpdate }: Props) {
       <ReservationDetail
         reservation={reservation}
         onUpdate={refresh}
-        onClose={() => router.back()}
+        onClose={onClose ?? (() => router.back())}
       />
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
