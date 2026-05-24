@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, Zap, Gauge, Users } from 'lucide-react'
+import { Plus, Pencil, Trash2, Zap, Gauge, Users, BanIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { JETSKI_STATUS_LABELS, type JetSki, type JetSkiStatus } from '@/types'
 import { JetSkiForm } from './jet-ski-form'
@@ -18,16 +18,50 @@ const statusVariant: Record<JetSkiStatus, 'default' | 'secondary' | 'destructive
   out_of_service: 'destructive',
 }
 
+/** Inline toggle — no extra dependency */
+function BookingToggle({
+  enabled,
+  disabled: busy,
+  onChange,
+}: {
+  enabled: boolean
+  disabled: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={enabled}
+      disabled={busy}
+      onClick={() => onChange(!enabled)}
+      className={[
+        'relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200',
+        enabled ? 'bg-blue-500' : 'bg-slate-300',
+        busy   ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+      ].join(' ')}
+    >
+      <span
+        className={[
+          'inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform duration-200',
+          enabled ? 'translate-x-[18px]' : 'translate-x-[3px]',
+        ].join(' ')}
+      />
+    </button>
+  )
+}
+
 interface Props {
   initialJetSkis: JetSki[]
 }
 
 export function FleetClient({ initialJetSkis }: Props) {
-  const [jetSkis, setJetSkis]     = useState<JetSki[]>(initialJetSkis)
-  const [editTarget, setEditTarget] = useState<JetSki | null>(null)
-  const [createOpen, setCreateOpen] = useState(false)
+  const [jetSkis, setJetSkis]           = useState<JetSki[]>(initialJetSkis)
+  const [editTarget, setEditTarget]     = useState<JetSki | null>(null)
+  const [createOpen, setCreateOpen]     = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<JetSki | null>(null)
-  const [deleting, setDeleting]    = useState(false)
+  const [deleting, setDeleting]         = useState(false)
+  const [togglingId, setTogglingId]     = useState<string | null>(null)
   const supabase = createClient()
 
   function handleSaved(saved: JetSki) {
@@ -40,8 +74,28 @@ export function FleetClient({ initialJetSkis }: Props) {
     setCreateOpen(false)
   }
 
+  async function handleBookingToggle(js: JetSki, newValue: boolean) {
+    setTogglingId(js.id)
+    const { error } = await supabase
+      .from('jet_skis')
+      .update({ booking_enabled: newValue })
+      .eq('id', js.id)
+
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
+    } else {
+      setJetSkis(prev => prev.map(j => j.id === js.id ? { ...j, booking_enabled: newValue } : j))
+      toast({
+        title: newValue
+          ? `${js.name} — réservations réactivées`
+          : `${js.name} — réservations bloquées`,
+        variant: newValue ? 'success' : 'default',
+      })
+    }
+    setTogglingId(null)
+  }
+
   async function handleDelete(js: JetSki) {
-    // Check for active/confirmed reservations first
     const { count } = await supabase
       .from('reservations')
       .select('id', { count: 'exact', head: true })
@@ -101,9 +155,20 @@ export function FleetClient({ initialJetSkis }: Props) {
                   <CardTitle className="text-lg leading-tight">{js.name}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-0.5">{js.model}</p>
                 </div>
-                <Badge variant={statusVariant[js.status]} className="shrink-0">
-                  {JETSKI_STATUS_LABELS[js.status]}
-                </Badge>
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <Badge variant={statusVariant[js.status]}>
+                    {JETSKI_STATUS_LABELS[js.status]}
+                  </Badge>
+                  {!js.booking_enabled && (
+                    <Badge
+                      variant="destructive"
+                      className="flex items-center gap-1 text-[11px]"
+                    >
+                      <BanIcon className="h-3 w-3" />
+                      Réservations bloquées
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
 
@@ -131,9 +196,9 @@ export function FleetClient({ initialJetSkis }: Props) {
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tarifs</p>
                 {([
-                  ['1 h',             js.price_1h],
-                  ['2 h',             js.price_2h],
-                  ['Demi-journée',    js.price_4h],
+                  ['1 h',          js.price_1h],
+                  ['2 h',          js.price_2h],
+                  ['Demi-journée', js.price_4h],
                 ] as [string, number][]).map(([label, price]) => (
                   <div key={label} className="flex justify-between text-sm py-0.5">
                     <span className="text-muted-foreground">{label}</span>
@@ -142,8 +207,23 @@ export function FleetClient({ initialJetSkis }: Props) {
                 ))}
               </div>
 
+              {/* Booking toggle */}
+              <div className="flex items-center justify-between pt-1 border-t">
+                <div>
+                  <p className="text-sm font-medium">Accepter les réservations</p>
+                  <p className="text-xs text-muted-foreground">
+                    {js.booking_enabled ? 'Ouvert à la réservation' : 'Bloqué — site public mis à jour'}
+                  </p>
+                </div>
+                <BookingToggle
+                  enabled={js.booking_enabled}
+                  disabled={togglingId === js.id}
+                  onChange={v => handleBookingToggle(js, v)}
+                />
+              </div>
+
               {/* Actions */}
-              <div className="flex gap-2 pt-1 border-t">
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"

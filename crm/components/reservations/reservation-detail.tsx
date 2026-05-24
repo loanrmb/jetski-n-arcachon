@@ -11,19 +11,25 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/use-toast'
-import { Phone, Mail, Users, Euro, FileText, ShieldCheck } from 'lucide-react'
+import { Phone, Mail, Users, Euro, FileText, ShieldCheck, AlertTriangle } from 'lucide-react'
 
 export type ReservationWithJoins = Reservation & { jet_ski?: JetSki; client?: Client }
 
+// Regular status-flow transitions (no_show uses dedicated button below)
 const NEXT_STATUS: Partial<Record<ReservationStatus, ReservationStatus[]>> = {
   pending:     ['confirmed', 'cancelled'],
-  confirmed:   ['in_progress', 'cancelled', 'no_show'],
+  confirmed:   ['in_progress', 'cancelled'],
   in_progress: ['completed'],
   completed:   [],
   cancelled:   [],
-  no_show:     [],
+  // Post no-show: allow correcting to confirmed / cancelled / completed
+  no_show:     ['confirmed', 'cancelled', 'completed'],
 }
+
+// Statuses where the dedicated "Marquer No-show" button appears
+const NO_SHOW_ELIGIBLE = new Set<ReservationStatus>(['confirmed', 'in_progress'])
 
 interface ReservationDetailProps {
   reservation: ReservationWithJoins
@@ -32,18 +38,16 @@ interface ReservationDetailProps {
 }
 
 export function ReservationDetail({ reservation: r, onUpdate, onClose }: ReservationDetailProps) {
-  // Optimistic status — updated instantly, reverted on error
-  const [currentStatus, setCurrentStatus] = useState<ReservationStatus>(r.status)
-  const [note, setNote]      = useState(r.internal_note ?? '')
-  const [fuel, setFuel]      = useState(r.fuel_note ?? '')
-  const [savingNotes, setSavingNotes] = useState(false)
+  const [currentStatus, setCurrentStatus]   = useState<ReservationStatus>(r.status)
+  const [note, setNote]                     = useState(r.internal_note ?? '')
+  const [fuel, setFuel]                     = useState(r.fuel_note ?? '')
+  const [savingNotes, setSavingNotes]       = useState(false)
   const [changingStatus, setChangingStatus] = useState<ReservationStatus | null>(null)
+  const [noShowOpen, setNoShowOpen]         = useState(false)
   const supabase = createClient()
 
   async function changeStatus(newStatus: ReservationStatus) {
     const previousStatus = currentStatus
-
-    // ① Instant optimistic update — UI feels immediate
     setCurrentStatus(newStatus)
     setChangingStatus(newStatus)
 
@@ -53,20 +57,23 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
       .eq('id', r.id)
 
     if (error) {
-      // Revert on failure
       setCurrentStatus(previousStatus)
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
     } else {
-      // Fire-and-forget audit log
       supabase.from('reservation_logs').insert({
-        reservation_id:   r.id,
-        old_status:       previousStatus,
-        new_status:       newStatus,
+        reservation_id: r.id,
+        old_status:     previousStatus,
+        new_status:     newStatus,
       })
       toast({ title: 'Statut mis à jour', variant: 'success' })
       onUpdate()
     }
     setChangingStatus(null)
+  }
+
+  async function confirmNoShow() {
+    setNoShowOpen(false)
+    await changeStatus('no_show')
   }
 
   async function saveNotes() {
@@ -85,7 +92,7 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
   }
 
   const nextStatuses = NEXT_STATUS[currentStatus] ?? []
-  const isDestructive = (s: ReservationStatus) => s === 'cancelled' || s === 'no_show'
+  const isDestructive = (s: ReservationStatus) => s === 'cancelled'
 
   return (
     <div className="space-y-5">
@@ -100,6 +107,7 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
           {STATUS_LABELS[currentStatus]}
         </span>
 
+        {/* Regular status-flow buttons */}
         {nextStatuses.map(ns => (
           <Button
             key={ns}
@@ -119,6 +127,27 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
             )}
           </Button>
         ))}
+
+        {/* Prominent no-show button — only for confirmed / in_progress */}
+        {NO_SHOW_ELIGIBLE.has(currentStatus) && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-violet-300 text-violet-700 hover:bg-violet-50 ml-auto"
+            onClick={() => setNoShowOpen(true)}
+            disabled={changingStatus !== null}
+          >
+            <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+            Marquer No-show
+          </Button>
+        )}
+
+        {/* Post no-show note */}
+        {currentStatus === 'no_show' && (
+          <p className="w-full text-xs text-muted-foreground italic">
+            Statut modifiable même après no-show
+          </p>
+        )}
       </div>
 
       <Separator />
@@ -241,6 +270,35 @@ export function ReservationDetail({ reservation: r, onUpdate, onClose }: Reserva
           {savingNotes ? 'Sauvegarde…' : 'Sauvegarder les notes'}
         </Button>
       </div>
+
+      {/* ── No-show confirmation dialog ── */}
+      <Dialog open={noShowOpen} onOpenChange={setNoShowOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-violet-600" />
+              Marquer comme No-show ?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Le client{r.client ? ` ${r.client.first_name} ${r.client.last_name}` : ''} ne s&apos;est pas présenté ?
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Le statut pourra être modifié ultérieurement (Confirmé, Annulé ou Terminé).
+          </p>
+          <div className="flex gap-3 justify-end mt-2">
+            <Button variant="outline" onClick={() => setNoShowOpen(false)}>Annuler</Button>
+            <Button
+              variant="outline"
+              className="border-violet-300 text-violet-700 hover:bg-violet-50"
+              onClick={confirmNoShow}
+              disabled={changingStatus !== null}
+            >
+              Confirmer le no-show
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

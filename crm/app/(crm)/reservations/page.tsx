@@ -2,12 +2,11 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { StatusBadge } from '@/components/reservations/status-badge'
+import { ReservationsClient } from '@/components/reservations/reservations-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { formatDate, formatTime } from '@/lib/utils'
-import { DURATION_LABELS, SOURCE_LABELS, type Reservation, type JetSki, type Client } from '@/types'
-import { Eye, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
+import type { Reservation, JetSki, Client } from '@/types'
 
 export const revalidate = 0
 
@@ -28,8 +27,24 @@ export default async function ReservationsPage({
     query = query.eq('status', searchParams.status)
   }
 
-  const { data } = await query.limit(200)
+  // Fetch repeat-client IDs in parallel (clients with 2+ completed reservations)
+  const [{ data }, { data: completedData }] = await Promise.all([
+    query.limit(200),
+    supabase.from('reservations').select('client_id').eq('status', 'completed'),
+  ])
+
   const reservations = (data ?? []) as (Reservation & { jet_ski: JetSki; client: Client })[]
+
+  // Count completed per client — O(n) scan
+  const completedCount: Record<string, number> = {}
+  for (const r of completedData ?? []) {
+    if (r.client_id) {
+      completedCount[r.client_id] = (completedCount[r.client_id] ?? 0) + 1
+    }
+  }
+  const repeatClientIds = new Set(
+    Object.entries(completedCount).filter(([, n]) => n >= 2).map(([id]) => id)
+  )
 
   const filtered = searchParams.search
     ? reservations.filter(r => {
@@ -81,61 +96,11 @@ export default async function ReservationsPage({
           </Button>
         </div>
 
-        {/* Tableau */}
-        <div className="rounded-lg border bg-white overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Client</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Créneau</TableHead>
-                <TableHead>Jet ski</TableHead>
-                <TableHead>Durée</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Prix</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground py-12">
-                    Aucune réservation trouvée.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map(r => (
-                  <TableRow key={r.id} className="transition-colors duration-100 hover:bg-slate-50/80">
-                    <TableCell>
-                      <p className="font-medium text-sm">{r.client?.first_name} {r.client?.last_name}</p>
-                      <p className="text-xs text-muted-foreground">{r.client?.email}</p>
-                    </TableCell>
-                    <TableCell className="text-sm">{formatDate(r.date)}</TableCell>
-                    <TableCell className="text-sm">{formatTime(r.slot_time)}</TableCell>
-                    <TableCell>
-                      <span className="flex items-center gap-1.5 text-sm">
-                        {r.jet_ski && (
-                          <span className="h-2 w-2 rounded-full inline-block shrink-0" style={{ backgroundColor: r.jet_ski.color }} />
-                        )}
-                        {r.jet_ski?.name}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm">{DURATION_LABELS[r.duration_hours]}</TableCell>
-                    <TableCell className="text-sm">{SOURCE_LABELS[r.source]}</TableCell>
-                    <TableCell className="text-sm font-medium">{r.price_total ? `${r.price_total} €` : '—'}</TableCell>
-                    <TableCell><StatusBadge status={r.status} /></TableCell>
-                    <TableCell>
-                      <Button asChild variant="ghost" size="icon">
-                        <Link href={`/reservations/${r.id}`}><Eye className="h-4 w-4" /></Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        {/* Table + bulk actions + CSV export */}
+        <ReservationsClient
+          reservations={filtered}
+          repeatClientIds={repeatClientIds}
+        />
       </main>
     </div>
   )

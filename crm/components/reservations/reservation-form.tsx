@@ -68,6 +68,7 @@ export function ReservationForm({ defaultDate, defaultSlot, onSuccess, onCancel 
       .from('jet_skis')
       .select('*')
       .eq('status', 'active')
+      .eq('booking_enabled', true)   // exclude models with bookings disabled
       .then(({ data }) => setJetSkis((data ?? []) as JetSki[]))
   }, [])
 

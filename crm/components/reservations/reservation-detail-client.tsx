@@ -22,7 +22,8 @@ export function ReservationDetailClient({ reservation, onUpdate }: Props) {
   const [editOpen, setEditOpen] = useState(false)
   const router = useRouter()
 
-  const canEdit = !['completed', 'cancelled', 'no_show'].includes(reservation.status)
+  // Allow editing even after no_show (staff may need to correct or re-confirm)
+  const canEdit = !['completed', 'cancelled'].includes(reservation.status)
 
   function refresh() {
     onUpdate ? onUpdate() : router.refresh()

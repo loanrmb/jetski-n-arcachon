@@ -9,13 +9,17 @@ import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import { createClient } from '@/lib/supabase/client'
-import { slotEndTime, STATUS_EVENT_COLOR, STATUS_EVENT_BORDER, hexRgba } from '@/lib/utils'
+import { slotEndTime, STATUS_EVENT_COLOR, STATUS_EVENT_BORDER, hexRgba, formatTime } from '@/lib/utils'
 import { STATUS_LABELS, type Reservation, type JetSki, type ReservationStatus } from '@/types'
 import { ReservationDetailClient } from '@/components/reservations/reservation-detail-client'
 import { ReservationForm } from '@/components/reservations/reservation-form'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
+import { StatusBadge } from '@/components/reservations/status-badge'
+import { ExternalLink, Save } from 'lucide-react'
 import type { ReservationWithJoins } from '@/components/reservations/reservation-detail'
 
 // Statuses that should appear dimmed in the calendar
@@ -23,8 +27,8 @@ const DIMMED = new Set<ReservationStatus>(['completed', 'cancelled', 'no_show'])
 
 function reservationToEvent(r: ReservationWithJoins): EventInput {
   const endTime = slotEndTime(r.slot_time, Number(r.duration_hours))
-  const hex    = STATUS_EVENT_COLOR[r.status]  ?? '#94A3B8'
-  const border = STATUS_EVENT_BORDER[r.status] ?? '#64748B'
+  const hex     = STATUS_EVENT_COLOR[r.status]  ?? '#94A3B8'
+  const border  = STATUS_EVENT_BORDER[r.status] ?? '#64748B'
   const isDimmed = DIMMED.has(r.status)
 
   return {
@@ -44,6 +48,9 @@ export function ReservationCalendar() {
   const [selectedRes, setSelectedRes]   = useState<ReservationWithJoins | null>(null)
   const [showDetail, setShowDetail]     = useState(false)
   const [showForm, setShowForm]         = useState(false)
+  const [showQuickNote, setShowQuickNote] = useState(false)
+  const [quickNoteText, setQuickNoteText] = useState('')
+  const [savingNote, setSavingNote]     = useState(false)
   const [newSlot, setNewSlot]           = useState<{ date: string; time: string } | null>(null)
   const [loading, setLoading]           = useState(true)
   const calendarRef = useRef<FullCalendar>(null)
@@ -70,10 +77,34 @@ export function ReservationCalendar() {
     return () => { supabase.removeChannel(channel) }
   }, [fetchReservations])
 
+  // ── Event click → quick note popover ─────────────────────────
   function handleEventClick(info: EventClickArg) {
     const r = info.event.extendedProps.reservation as ReservationWithJoins
     setSelectedRes(r)
+    setQuickNoteText(r.internal_note ?? '')
+    setShowQuickNote(true)
+  }
+
+  function openFullDetail() {
+    setShowQuickNote(false)
     setShowDetail(true)
+  }
+
+  async function saveQuickNote() {
+    if (!selectedRes) return
+    setSavingNote(true)
+    const { error } = await supabase
+      .from('reservations')
+      .update({ internal_note: quickNoteText, updated_at: new Date().toISOString() })
+      .eq('id', selectedRes.id)
+
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' })
+    } else {
+      toast({ title: 'Note sauvegardée', variant: 'success' })
+      fetchReservations()
+    }
+    setSavingNote(false)
   }
 
   function handleDateClick(info: DateClickArg) {
@@ -107,10 +138,8 @@ export function ReservationCalendar() {
     }
   }
 
-  // Called by ReservationDetailClient after a status change or edit
   function handleDetailUpdate() {
     fetchReservations()
-    // Optimistic: keep dialog open so staff can make follow-up changes
   }
 
   const events = reservations.map(reservationToEvent)
@@ -125,16 +154,15 @@ export function ReservationCalendar() {
             {STATUS_LABELS[status]}
           </span>
         ))}
-        {/* Jet-ski colour dots — shown inside events */}
         <span className="ml-4 text-slate-400">|</span>
         {[
-          { label: 'GTI SE 130 ●', color: '#3B82F6' },
-          { label: 'GTX 230 ●',    color: '#10B981' },
-          { label: 'RXT-X 300 ●',  color: '#EF4444' },
+          { label: 'GTI SE 130', color: '#3B82F6' },
+          { label: 'GTX 230',    color: '#10B981' },
+          { label: 'RXT-X 300',  color: '#EF4444' },
         ].map(({ label, color }) => (
           <span key={label} className="flex items-center gap-1 text-slate-400">
             <span className="h-2 w-2 rounded-full inline-block" style={{ backgroundColor: color }} />
-            {label.replace(' ●', '')}
+            {label}
           </span>
         ))}
       </div>
@@ -193,7 +221,75 @@ export function ReservationCalendar() {
         )}
       </div>
 
-      {/* ── Reservation detail modal ── */}
+      {/* ── Quick note popover (compact dialog) ── */}
+      <Dialog open={showQuickNote} onOpenChange={open => {
+        setShowQuickNote(open)
+        if (!open) { setSelectedRes(null); setQuickNoteText('') }
+      }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              {selectedRes?.jet_ski && (
+                <span
+                  className="h-2.5 w-2.5 rounded-full inline-block shrink-0"
+                  style={{ backgroundColor: selectedRes.jet_ski.color }}
+                />
+              )}
+              {selectedRes?.client?.first_name} {selectedRes?.client?.last_name}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedRes && (
+            <div className="space-y-3">
+              {/* Quick info */}
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <StatusBadge status={selectedRes.status} />
+                <span>·</span>
+                <span>{formatTime(selectedRes.slot_time)}</span>
+                <span>·</span>
+                <span>{selectedRes.jet_ski?.name ?? '—'}</span>
+              </div>
+
+              {/* Quick note */}
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-slate-600">Note rapide</p>
+                <Textarea
+                  rows={3}
+                  value={quickNoteText}
+                  onChange={e => setQuickNoteText(e.target.value)}
+                  placeholder="Note interne staff…"
+                  className="text-sm resize-none"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <Button
+                  size="sm"
+                  variant="accent"
+                  disabled={savingNote}
+                  onClick={saveQuickNote}
+                  className="gap-1.5"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  {savingNote ? 'Sauvegarde…' : 'Sauvegarder'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={openFullDetail}
+                  className="gap-1.5 text-muted-foreground"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Ouvrir la fiche complète
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Full reservation detail modal ── */}
       <Dialog open={showDetail} onOpenChange={open => {
         setShowDetail(open)
         if (!open) setSelectedRes(null)

@@ -74,6 +74,38 @@ export function emailRappel(r: Partial<Reservation> & { client_first_name: strin
   `)
 }
 
+/** J-1 automated reminder (same content as emailRappel, exposed under its own name for cron use) */
+export function emailRappelJ1(r: Partial<Reservation> & { client_first_name: string }): string {
+  return base(`
+    <p>Bonjour <strong>${r.client_first_name}</strong>,</p>
+    <p>Rappel : votre sortie jet ski est <strong>demain</strong> !</p>
+    ${detail(r)}
+    <p>N'oubliez pas :</p>
+    <ul>
+      <li>Votre <strong>permis côtier</strong> (obligatoire)</li>
+      <li>La <strong>caution de 2 000 €</strong> (chèque ou espèces)</li>
+      <li>Présentez-vous <strong>15 minutes avant</strong> votre créneau</li>
+    </ul>
+    <p>Adresse : <strong>Jetée Thiers, Port d'Arcachon, 33120</strong></p>
+  `)
+}
+
+/** H-3 automated reminder sent 3 hours before the slot */
+export function emailRappelH3(r: Partial<Reservation> & { client_first_name: string }): string {
+  return base(`
+    <p>Bonjour <strong>${r.client_first_name}</strong>,</p>
+    <p>🏄 C'est pour dans <strong>3 heures</strong> — votre jet ski vous attend !</p>
+    ${detail(r)}
+    <p>Derniers rappels :</p>
+    <ul>
+      <li>Permis côtier obligatoire</li>
+      <li>Caution de <strong>2 000 €</strong> sur place (chèque ou espèces)</li>
+      <li>Rendez-vous <strong>15 minutes avant</strong> votre créneau</li>
+    </ul>
+    <p>Adresse : <strong>Jetée Thiers, Port d'Arcachon, 33120</strong></p>
+  `)
+}
+
 export function emailAnnulation(r: Partial<Reservation> & { client_first_name: string }): string {
   return base(`
     <p>Bonjour <strong>${r.client_first_name}</strong>,</p>

@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, BanIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import { Alerts } from '@/components/dashboard/alerts'
+import { WeatherWidget } from '@/components/dashboard/weather-widget'
 import { StatusBadge } from '@/components/reservations/status-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,7 +16,7 @@ export const revalidate = 0
 
 export default async function DashboardPage() {
   const supabase = createClient()
-  const today    = new Date().toISOString().split('T')[0]
+  const today      = new Date().toISOString().split('T')[0]
   const twoHoursAgo = subHours(new Date(), 2).toISOString()
 
   // Réservations du jour avec jointures
@@ -42,7 +43,7 @@ export default async function DashboardPage() {
     .lt('created_at', twoHoursAgo)
   const stalePending = (staleData ?? []) as Reservation[]
 
-  // Statut de la flotte
+  // Statut de la flotte (including booking_enabled)
   const { data: jetSkis } = await supabase.from('jet_skis').select('*').eq('status', 'active')
   const activeJetSkis = (jetSkis ?? []) as JetSki[]
   const occupiedIds   = new Set(
@@ -77,7 +78,7 @@ export default async function DashboardPage() {
               <CardContent>
                 {reservations.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">
-                    Aucune réservation aujourd'hui.
+                    Aucune réservation aujourd&apos;hui.
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -108,36 +109,50 @@ export default async function DashboardPage() {
             </Card>
           </div>
 
-          {/* Statut de la flotte */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Flotte</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {activeJetSkis.map(js => {
-                const occupied = occupiedIds.has(js.id)
-                return (
-                  <div key={js.id} className="flex items-center gap-3">
-                    <div
-                      className="h-3 w-3 rounded-full shrink-0"
-                      style={{ backgroundColor: js.color }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{js.name}</p>
-                      <p className="text-xs text-muted-foreground">{js.model}</p>
+          {/* Right column: Flotte + Météo */}
+          <div className="space-y-4">
+            {/* Statut de la flotte */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Flotte</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {activeJetSkis.map(js => {
+                  const occupied = occupiedIds.has(js.id)
+                  const blocked  = !js.booking_enabled
+                  return (
+                    <div key={js.id} className="flex items-center gap-3">
+                      <div
+                        className="h-3 w-3 rounded-full shrink-0"
+                        style={{ backgroundColor: js.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{js.name}</p>
+                        <p className="text-xs text-muted-foreground">{js.model}</p>
+                      </div>
+                      {blocked ? (
+                        <span className="flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                          <BanIcon className="h-3 w-3" />
+                          Bloqué
+                        </span>
+                      ) : (
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                          occupied
+                            ? 'bg-purple-100 text-purple-800'
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {occupied ? 'En mer' : 'Disponible'}
+                        </span>
+                      )}
                     </div>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      occupied
-                        ? 'bg-purple-100 text-purple-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {occupied ? 'En mer' : 'Disponible'}
-                    </span>
-                  </div>
-                )
-              })}
-            </CardContent>
-          </Card>
+                  )
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Météo */}
+            <WeatherWidget />
+          </div>
         </div>
       </main>
     </div>

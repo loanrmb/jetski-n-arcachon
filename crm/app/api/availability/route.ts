@@ -5,6 +5,13 @@ export async function GET(request: NextRequest) {
   const supabase = createClient()
   const { searchParams } = new URL(request.url)
 
+  // ── Block disabled models (booking_enabled = false) ──────────
+  const { data: disabledJs } = await supabase
+    .from('jet_skis')
+    .select('id')
+    .eq('booking_enabled', false)
+  const disabledIds = (disabledJs ?? []).map(j => j.id as string)
+
   let query = supabase
     .from('availabilities')
     .select('*, jet_ski:jet_skis(*)')
@@ -12,10 +19,15 @@ export async function GET(request: NextRequest) {
     .order('date')
     .order('slot_time')
 
-  const date      = searchParams.get('date')
-  const jetSkiId  = searchParams.get('jet_ski_id')
-  const from      = searchParams.get('from')
-  const to        = searchParams.get('to')
+  // Exclude slots that belong to a booking-disabled jet ski
+  if (disabledIds.length > 0) {
+    query = query.not('jet_ski_id', 'in', `(${disabledIds.join(',')})`)
+  }
+
+  const date     = searchParams.get('date')
+  const jetSkiId = searchParams.get('jet_ski_id')
+  const from     = searchParams.get('from')
+  const to       = searchParams.get('to')
 
   if (date)     query = query.eq('date', date)
   if (jetSkiId) query = query.eq('jet_ski_id', jetSkiId)

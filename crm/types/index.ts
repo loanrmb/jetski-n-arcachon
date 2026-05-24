@@ -15,6 +15,7 @@ export interface JetSki {
   price_2h: number
   price_4h: number
   status: JetSkiStatus
+  booking_enabled: boolean
   image_url?: string
   color: string
   created_at: string
@@ -49,6 +50,8 @@ export interface Reservation {
   caution_collected: boolean
   price_total?: number
   requested_jet_ski?: string
+  reminder_j1_sent?: string
+  reminder_h3_sent?: string
   created_at: string
   updated_at: string
   jet_ski?: JetSki
