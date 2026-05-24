@@ -27,8 +27,15 @@
 }
 
 html { -webkit-font-smoothing: antialiased; }
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
+
+/* ── Scroll performance */
+html {
+  scroll-behavior: auto; /* disable CSS smooth, we handle it in JS */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; }
 }
 
 body {
@@ -38,6 +45,8 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
 }
 
 .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }

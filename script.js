@@ -2,6 +2,39 @@
 
 'use strict';
 
+// ── Smooth scroll engine (60fps+, natural easing)
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function smoothScrollTo(targetY, duration = 1000) {
+  if (prefersReducedMotion) {
+    window.scrollTo({ top: targetY, behavior: 'auto' });
+    return;
+  }
+
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  const startTime = performance.now();
+
+  // Natural deceleration curve (ease-out cubic)
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function step(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOutCubic(progress);
+
+    window.scrollTo(0, startY + distance * eased);
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
 // ── SUPABASE — anon key is safe to expose client-side.
 const SUPABASE_URL      = 'https://uwoqubisdlqoqblitzrf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3b3F1YmlzZGxxb3FibGl0enJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzI5MjgsImV4cCI6MjA5NDk0ODkyOH0.AxSPUEV_KtLYxBRDs3xOCAHFQVmQBuwQ3J5hXeHclvw';
@@ -677,15 +710,48 @@ mobMenu.querySelectorAll('a').forEach(a => {
   });
 });
 
-// ── SMOOTH SCROLL
+// ── Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const tgt = document.querySelector(a.getAttribute('href'));
     if (!tgt) return;
     e.preventDefault();
     const top = tgt.getBoundingClientRect().top + window.scrollY - 60;
-    window.scrollTo({ top, behavior: 'smooth' });
+    smoothScrollTo(top, 800);
   });
+});
+
+// ── Keyboard smooth scroll (Page Up/Down, Space)
+let keyScrollPending = false;
+document.addEventListener('keydown', e => {
+  if (keyScrollPending || prefersReducedMotion) return;
+
+  const viewportH = window.innerHeight;
+  let delta = 0;
+
+  if (e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey)) {
+    delta = viewportH * 0.85;
+    e.preventDefault();
+  } else if (e.key === 'PageUp' || (e.key === ' ' && e.shiftKey)) {
+    delta = -viewportH * 0.85;
+    e.preventDefault();
+  } else if (e.key === 'ArrowDown' && e.metaKey) {
+    delta = viewportH * 0.85;
+    e.preventDefault();
+  } else if (e.key === 'ArrowUp' && e.metaKey) {
+    delta = -viewportH * 0.85;
+    e.preventDefault();
+  }
+
+  if (delta !== 0) {
+    keyScrollPending = true;
+    const target = Math.max(0, Math.min(
+      document.documentElement.scrollHeight - viewportH,
+      window.scrollY + delta
+    ));
+    smoothScrollTo(target, 600);
+    setTimeout(() => { keyScrollPending = false; }, 650);
+  }
 });
 
 // ── INIT
