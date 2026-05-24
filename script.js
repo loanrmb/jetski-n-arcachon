@@ -948,26 +948,9 @@ setTimeout(() => {
         : now.getHours() >= 22 || now.getHours() < 7; // fallback
 
       if (isNight) {
-        // Override weather icon to moon
         document.getElementById('weatherIcon').innerHTML =
           '<span style="font-size:56px;line-height:1">🌙</span>';
-
-        // Show "À demain" badge in hero eyebrow
-        const eyebrow = document.querySelector('.intro .eyebrow');
-        if (eyebrow) {
-          eyebrow.textContent = 'On reprend demain matin 🌙  ·  Réservez dès maintenant';
-        }
-
-        // Soft night message in availability section subtitle
-        const availSub = document.querySelector('.avail-text .sec-sub');
-        if (availSub) {
-          availSub.innerHTML =
-            'Nos jets skis rentrent au port après le coucher du soleil. ' +
-            'Vous pouvez dès maintenant réserver un créneau pour demain — ' +
-            'premier départ à 9h.';
-        }
-
-        return; // Skip rest of weather rendering (no forecast needed at night)
+        return;
       }
 
       // ① Conditions actuelles
