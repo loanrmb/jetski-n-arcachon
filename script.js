@@ -52,7 +52,10 @@ let blockedSet = new Set(); // "YYYY-MM-DD|HH:MM|jet_ski_id"
 // ── SUPABASE — DATA LAYER
 
 async function fetchJetSkis() {
-  const { data } = await sb.from('jet_skis').select('id,name').eq('status', 'active');
+  // Order by power_hp ASC so jetSkis[0/1/2] aligns with MODELS[0/1/2] (cheapest→fastest).
+  const { data } = await sb.from('jet_skis').select('id,name,power_hp')
+    .eq('status', 'active')
+    .order('power_hp', { ascending: true });
   jetSkis   = data ?? [];
   jetSkiIds = jetSkis.map(r => r.id);
 }
@@ -267,9 +270,21 @@ function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
 
 // ── TIME SLOTS (step 2)
 function renderTimeSlots() {
+  // Map the selected model to its specific jet ski UUID.
+  // MODELS[] and jetSkis[] share the same cheapest→fastest order (fetchJetSkis orders by power_hp ASC).
+  // This lets us check per-jet-ski blocking rather than all-or-nothing.
+  const modelIdx   = MODELS.findIndex(m => m.dbName === selectedJetSki);
+  const selectedId = modelIdx >= 0 ? (jetSkis[modelIdx]?.id ?? null) : null;
+
   document.querySelectorAll('.tslot').forEach(btn => {
     const slot = btn.dataset.t;
-    const full = !!(selectedDate && isSlotFull(selectedDate, slot));
+    let full = false;
+    if (selectedDate) {
+      // Per-jet-ski check when we know the exact model; all-skis fallback otherwise.
+      full = selectedId
+        ? blockedSet.has(`${selectedDate}|${slot}|${selectedId}`)
+        : isSlotFull(selectedDate, slot);
+    }
     btn.disabled = full;
     btn.classList.toggle('tslot--disabled', full);
     // If the currently-selected slot just became full, deselect it
