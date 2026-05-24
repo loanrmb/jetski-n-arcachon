@@ -816,7 +816,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .weather-inner { gap: 16px; }
   .weather-badge { margin-left: 0; width: 100%; justify-content: center; }
   .wf-row { padding: 11px 14px; gap: 8px; }
-  .wf-day { font-size: 0.8rem; width: 44px; }
+  .wf-day { font-size: 0.78rem; min-width: 80px; }
   .weather-cta { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
   .weather-cta .btn { width: 100%; text-align: center; }
 }
@@ -1253,7 +1253,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   font-size: 0.88rem;
   font-weight: 600;
   color: #fff;
-  width: 52px;
+  min-width: 90px;
   flex-shrink: 0;
 }
 .wf-emoji {

@@ -793,7 +793,7 @@ setTimeout(() => {
     '&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset' +
     '&wind_speed_unit=kn&forecast_days=5&timezone=Europe%2FParis';
 
-  const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  const DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 
   function getCondition(windKn) {
     if (windKn < 10) return { label: 'Idéal pour naviguer',   cls: 'weather-badge--good' };
@@ -803,10 +803,8 @@ setTimeout(() => {
   }
 
   function emojiForCode(code) {
-    if (code === 0)                                                return '☀️';  // clear sky
-    if (code === 1)                                                return '☀️';  // mainly clear  → Apple shows sun
-    if (code === 2)                                                return '🌤';  // partly cloudy → Apple shows sun+cloud
-    if (code === 3)                                                return '⛅';  // overcast      → Apple shows clouds
+    if (code <= 2)                                                 return '☀️';  // clear / mainly clear / partly cloudy
+    if (code === 3)                                                return '🌤';  // overcast
     if (code === 45 || code === 48)                                return '🌫';
     if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '🌧';
     if (code >= 71 && code <= 77)                                  return '❄️';
@@ -829,7 +827,7 @@ setTimeout(() => {
       const tmax  = Math.round(tmaxs[i]);
       const tmin  = Math.round(tmins[i]);
       const dow   = new Date(dateStr + 'T12:00:00').getDay();
-      const day   = i === 0 ? 'Auj.' : i === 1 ? 'Dem.' : DAYS_FR[dow] + '.';
+      const day   = i === 0 ? 'Aujourd\'hui' : i === 1 ? 'Demain' : DAYS_FR[dow];
       const emoji = emojiForCode(code);
 
       // Bar segment: left offset + width as % of global range
