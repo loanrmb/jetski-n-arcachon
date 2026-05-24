@@ -1392,7 +1392,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-weight: 600; }
 
   /* ── Availability calendar: stack vertically, no overflow ── */
-  .avail-layout { gap: 24px; }
+  .avail-layout { grid-template-columns: 1fr; gap: 24px; }
   .avail-card { width: 100%; max-width: 100%; overflow: hidden; }
 
   /* ── Carousel: hide arrows — swipe/touch handles nav ── */
