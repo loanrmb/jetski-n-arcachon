@@ -1177,37 +1177,14 @@ setTimeout(() => {
   setInterval(rotate, CYCLE);
 }());
 
-// ── Lenis smooth scroll
-const lenis = new Lenis({
-  duration: 1.2,
-  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-  lerp: 0.1,
-  smoothWheel: true,
-  wheelMultiplier: 1,
-  touchMultiplier: 2,
-  infinite: false,
-});
-
-// RAF loop
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-}
-requestAnimationFrame(raf);
-
-// Anchor links
+// ── Anchor links with nav offset
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const href = a.getAttribute('href');
-    const target = document.querySelector(href);
-    if (!target) return;
+    const tgt = document.querySelector(a.getAttribute('href'));
+    if (!tgt) return;
     e.preventDefault();
-    lenis.scrollTo(target, { offset: -60, duration: 1 });
+    const top = tgt.getBoundingClientRect().top + window.scrollY - 60;
+    window.scrollTo({ top, behavior: 'smooth' });
   });
 });
-
-// Respect prefers-reduced-motion
-if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  lenis.destroy();
-}
 
