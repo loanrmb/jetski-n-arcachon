@@ -99,10 +99,30 @@ function isSlotFull(dateStr, slot) {
 // ── SUPABASE — REALTIME
 
 function setupRealtime() {
-  sb.channel('site-live')
+  // Availabilities — all events (manual blocks added/removed by staff)
+  sb.channel('site-availabilities')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'availabilities' }, onLiveUpdate)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' },   onLiveUpdate)
-    .subscribe();
+    .subscribe((status) => console.log('[realtime] availabilities channel:', status));
+
+  // Reservations — explicit INSERT / UPDATE / DELETE listeners.
+  // '*' was not reliably firing for UPDATE; explicit event types are.
+  sb.channel('site-reservations')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'reservations' },
+      () => onLiveUpdate()
+    )
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'reservations' },
+      (payload) => {
+        console.log('[realtime] reservation updated', payload.new?.status);
+        onLiveUpdate();
+      }
+    )
+    .on('postgres_changes',
+      { event: 'DELETE', schema: 'public', table: 'reservations' },
+      () => onLiveUpdate()
+    )
+    .subscribe((status) => console.log('[realtime] reservations channel:', status));
 }
 
 async function onLiveUpdate() {
