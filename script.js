@@ -814,7 +814,18 @@ function staggerRAF(elements, msPerStep, onReveal) {
       entries.forEach(e => {
         if (e.isIntersecting && !ptFlipDone) {
           ptFlipDone = true;
-          staggerRAF(ptFlipCells, 80, el => el.classList.add('visible'));
+          const total = ptFlipCells.length;
+          let revealed = 0;
+          staggerRAF(ptFlipCells, 80, el => {
+            el.classList.add('visible');
+            el.style.willChange = 'auto';
+            revealed++;
+            if (revealed === total) {
+              // All done — remove perspective from table too
+              const pt = document.querySelector('.price-table');
+              if (pt) pt.style.perspective = 'none';
+            }
+          });
           ptFlipObs.disconnect();
         }
       });

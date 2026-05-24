@@ -1064,7 +1064,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1),
               opacity   400ms ease;
   backface-visibility: hidden;
-  will-change: transform, opacity;
 }
 .pt-row:not(.pt-head) .pt-c:not(.pt-c--name).visible {
   opacity: 1;
