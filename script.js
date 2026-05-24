@@ -130,7 +130,10 @@ async function onLiveUpdate() {
   renderAvail();
   if (overlay.classList.contains('open')) {
     buildCal('calGrid', calY, calM, true, selectedDate);
-    if ($('step2')?.classList.contains('active') && selectedDate) renderTimeSlots();
+    // Refresh slot buttons whenever blockedSet changes,
+    // regardless of which step is currently active.
+    // renderTimeSlots() guards against null selectedDate internally.
+    if (selectedDate) renderTimeSlots();
   }
 }
 
@@ -291,6 +294,8 @@ function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
 
 // ── TIME SLOTS (step 2)
 function renderTimeSlots() {
+  if (!selectedDate) return; // nothing to render without a date
+
   // Map the selected model to its specific jet ski UUID.
   // MODELS[] and jetSkis[] share the same cheapest→fastest order (fetchJetSkis orders by power_hp ASC).
   // This lets us check per-jet-ski blocking rather than all-or-nothing.
