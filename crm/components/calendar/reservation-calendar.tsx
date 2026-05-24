@@ -9,7 +9,7 @@ import frLocale from '@fullcalendar/core/locales/fr'
 import type { EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import { createClient } from '@/lib/supabase/client'
-import { slotEndTime, STATUS_BADGE, hexRgba } from '@/lib/utils'
+import { slotEndTime } from '@/lib/utils'
 import { STATUS_LABELS, type ReservationStatus } from '@/types'
 import { ReservationDetailClient } from '@/components/reservations/reservation-detail-client'
 import { ReservationForm } from '@/components/reservations/reservation-form'
@@ -18,10 +18,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
 import type { ReservationWithJoins } from '@/components/reservations/reservation-detail'
 
-// Statuses that appear dimmed (greyed out) in the calendar
-const DIMMED = new Set<ReservationStatus>(['completed', 'cancelled', 'no_show'])
+// Block background color keyed by status — primary visual signal in the calendar
+const STATUS_COLORS: Record<ReservationStatus, string> = {
+  pending:     '#F59E0B',
+  confirmed:   '#3B82F6',
+  in_progress: '#10B981',
+  completed:   '#6B7280',
+  cancelled:   '#EF4444',
+  no_show:     '#8B5CF6',
+}
 
-// Jet ski models — used for filter tabs and legend
+// Jet ski models — used for filter tabs and model dot colors
 const JET_SKI_MODELS = [
   { name: 'GTI SE 130', color: '#3B82F6' },
   { name: 'GTX 230',    color: '#10B981' },
@@ -29,18 +36,17 @@ const JET_SKI_MODELS = [
 ]
 
 function reservationToEvent(r: ReservationWithJoins): EventInput {
-  const endTime  = slotEndTime(r.slot_time, Number(r.duration_hours))
-  const hex      = r.jet_ski?.color ?? '#94A3B8'
-  const isDimmed = DIMMED.has(r.status)
+  const endTime = slotEndTime(r.slot_time, Number(r.duration_hours))
+  const color   = STATUS_COLORS[r.status] ?? '#6B7280'
 
   return {
     id:              r.id,
     title:           `${r.client?.first_name ?? ''} ${r.client?.last_name ?? ''}`,
     start:           `${r.date}T${r.slot_time}`,
     end:             `${r.date}T${endTime}`,
-    backgroundColor: isDimmed ? hexRgba(hex, 0.40) : hex,
-    borderColor:     isDimmed ? hexRgba(hex, 0.50) : hex,
-    textColor:       isDimmed ? '#64748B' : '#ffffff',
+    backgroundColor: color,
+    borderColor:     color,
+    textColor:       '#ffffff',
     extendedProps:   { reservation: r },
   }
 }
@@ -127,12 +133,13 @@ export function ReservationCalendar() {
   return (
     <>
       {/* ── Status legend ── */}
-      <div className="flex flex-wrap gap-x-3 gap-y-2 mb-3 text-xs">
-        {(Object.entries(STATUS_BADGE) as [ReservationStatus, string][]).map(([status, cls]) => (
-          <span
-            key={status}
-            className={`inline-flex items-center rounded px-1.5 py-0.5 border font-medium ${cls}`}
-          >
+      <div className="flex flex-wrap gap-x-5 gap-y-2 mb-3 text-xs text-slate-600">
+        {(Object.entries(STATUS_COLORS) as [ReservationStatus, string][]).map(([status, color]) => (
+          <span key={status} className="flex items-center gap-1.5">
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
+              style={{ backgroundColor: color }}
+            />
             {STATUS_LABELS[status]}
           </span>
         ))}
@@ -276,28 +283,25 @@ export function ReservationCalendar() {
 }
 
 function renderEventContent(eventInfo: { event: { extendedProps: { reservation: ReservationWithJoins } } }) {
-  const r      = eventInfo.event.extendedProps.reservation
-  const badgeCls = STATUS_BADGE[r.status] ?? 'bg-slate-100 text-slate-600 border-slate-300'
-  const label    = STATUS_LABELS[r.status] ?? r.status
+  const r         = eventInfo.event.extendedProps.reservation
+  const modelName = r.requested_jet_ski ?? r.jet_ski?.name ?? '—'
+  const dotColor  = r.jet_ski?.color ?? '#6B7280'
+  const label     = STATUS_LABELS[r.status] ?? r.status
 
   return (
     <div className="px-1 py-0.5 overflow-hidden leading-tight text-[11px] space-y-0.5">
-      {/* Line 1: model color dot + model short name */}
-      <p className="font-semibold truncate flex items-center gap-1">
-        {r.jet_ski && (
-          <span
-            className="inline-block h-1.5 w-1.5 rounded-full shrink-0 ring-1 ring-white/40"
-            style={{ backgroundColor: r.jet_ski.color }}
-          />
-        )}
-        <span className="truncate">{r.jet_ski?.name ?? '—'}</span>
+      {/* Line 1: model color dot + model name */}
+      <p className="truncate flex items-center gap-1">
+        <span
+          className="inline-block h-1.5 w-1.5 rounded-full shrink-0 ring-1 ring-white/40"
+          style={{ backgroundColor: dotColor }}
+        />
+        <span className="truncate">{modelName}</span>
       </p>
-      {/* Line 2: client first name */}
-      <p className="truncate">{r.client?.first_name ?? ''}</p>
-      {/* Line 3: status badge pill */}
-      <span className={`inline-flex items-center rounded px-1 py-px text-[10px] font-medium border ${badgeCls}`}>
-        {label}
-      </span>
+      {/* Line 2: client first name — bold */}
+      <p className="font-bold truncate">{r.client?.first_name ?? ''}</p>
+      {/* Line 3: status label — small, slightly transparent */}
+      <p className="truncate text-[10px]" style={{ opacity: 0.75 }}>{label}</p>
     </div>
   )
 }
