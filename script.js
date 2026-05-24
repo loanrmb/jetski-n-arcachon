@@ -4,17 +4,12 @@
 
 'use strict';
 
-/* ─────────────────────────────
-   SUPABASE — anon key is safe to expose client-side.
-   RLS policies enforce what anon can read/write.
-───────────────────────────── */
+// ── SUPABASE — anon key is safe to expose client-side.
 const SUPABASE_URL      = 'https://uwoqubisdlqoqblitzrf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3b3F1YmlzZGxxb3FibGl0enJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzI5MjgsImV4cCI6MjA5NDk0ODkyOH0.AxSPUEV_KtLYxBRDs3xOCAHFQVmQBuwQ3J5hXeHclvw';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ─────────────────────────────
-   CONSTANTS
-───────────────────────────── */
+// ── CONSTANTS
 const MODELS = [
   { name: 'Sea-Doo GTX 170',        dbName: 'GTX 170',        price: '110 €', prices: { 1: '110 €', 2: '195 €', 4: '360 €' } },
   { name: 'Sea-Doo GTX Limited 230', dbName: 'GTX Limited 230', price: '125 €', prices: { 1: '125 €', 2: '220 €', 4: '395 €' } },
@@ -36,9 +31,7 @@ TODAY.setHours(0, 0, 0, 0);
 
 const $ = id => document.getElementById(id);
 
-/* ─────────────────────────────
-   STATE
-───────────────────────────── */
+// ── STATE
 let currentModel     = 0;
 let mtIsAnimating    = false;
 let calY             = TODAY.getFullYear();
@@ -56,9 +49,7 @@ let jetSkis   = [];        // {id, name} — active jet skis
 let jetSkiIds = [];        // UUID list derived from jetSkis
 let blockedSet = new Set(); // "YYYY-MM-DD|HH:MM|jet_ski_id"
 
-/* ─────────────────────────────
-   SUPABASE — DATA LAYER
-───────────────────────────── */
+// ── SUPABASE — DATA LAYER
 
 async function fetchJetSkis() {
   const { data } = await sb.from('jet_skis').select('id,name').eq('status', 'active');
@@ -85,9 +76,7 @@ async function fetchBlocked() {
   );
 }
 
-/* ─────────────────────────────
-   AVAILABILITY HELPERS
-───────────────────────────── */
+// ── AVAILABILITY HELPERS
 
 // A day is "Complet" only when all jet skis × all 4 slots are blocked.
 function isDayFull(dateStr) {
@@ -103,9 +92,7 @@ function isSlotFull(dateStr, slot) {
   return jetSkiIds.every(id => blockedSet.has(`${dateStr}|${slot}|${id}`));
 }
 
-/* ─────────────────────────────
-   SUPABASE — REALTIME
-───────────────────────────── */
+// ── SUPABASE — REALTIME
 
 function setupRealtime() {
   sb.channel('site-live')
@@ -123,9 +110,7 @@ async function onLiveUpdate() {
   }
 }
 
-/* ─────────────────────────────
-   MODEL TABS
-───────────────────────────── */
+// ── MODEL TABS
 const mtTabs   = document.querySelectorAll('.mt-tab');
 const mtSlides = document.querySelectorAll('.mt-slide');
 
@@ -200,9 +185,7 @@ mtTabs.forEach(tab => {
   });
 });
 
-/* ─────────────────────────────
-   MODEL STAGE — Mac trackpad two-finger swipe
-───────────────────────────── */
+// ── MODEL STAGE — Mac trackpad two-finger swipe
 (function () {
   if (!mtStage) return;
   let wheelCooling = false;
@@ -219,10 +202,7 @@ mtTabs.forEach(tab => {
   }, { passive: false });
 })();
 
-/* ─────────────────────────────
-   RESERVE BUTTONS (model CTA)
-   Each .btn-reserve has data-model="0|1|2" matching MODELS index.
-───────────────────────────── */
+// ── RESERVE BUTTONS (model CTA)
 document.querySelectorAll('.btn-reserve').forEach(btn => {
   btn.addEventListener('click', () => {
     const idx = +(btn.dataset.model ?? currentModel);
@@ -230,12 +210,7 @@ document.querySelectorAll('.btn-reserve').forEach(btn => {
   });
 });
 
-/* ─────────────────────────────
-   CALENDAR BUILDER
-   onDateClick — optional callback(dateStr).
-   When supplied (avail calendar), a date click calls the callback instead
-   of the default modal-calendar behavior (select date in current modal).
-───────────────────────────── */
+// ── CALENDAR BUILDER
 function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
   const grid = $(gridId);
   if (!grid) return;
@@ -290,9 +265,7 @@ function buildCal(gridId, year, month, interactive, selDate, onDateClick) {
   }
 }
 
-/* ─────────────────────────────
-   TIME SLOTS (step 2)
-───────────────────────────── */
+// ── TIME SLOTS (step 2)
 function renderTimeSlots() {
   document.querySelectorAll('.tslot').forEach(btn => {
     const slot = btn.dataset.t;
@@ -318,9 +291,7 @@ document.querySelectorAll('.tslot').forEach(btn => {
   });
 });
 
-/* ─────────────────────────────
-   DURATION BUTTONS (step 2)
-───────────────────────────── */
+// ── DURATION BUTTONS (step 2)
 document.querySelectorAll('.dslot').forEach(btn => {
   btn.addEventListener('click', () => {
     selectedDuration = +btn.dataset.d;
@@ -346,9 +317,7 @@ function updateDurPrice() {
   el.textContent = `${m.prices[selectedDuration]} · ${durLabel}`;
 }
 
-/* ─────────────────────────────
-   STEP NAVIGATION
-───────────────────────────── */
+// ── STEP NAVIGATION
 const overlay = $('overlay');
 
 // All step IDs in document order
@@ -382,10 +351,7 @@ function updateCalTitle() {
   if (el) el.textContent = `${MONTHS_FR[calM]} ${calY}`;
 }
 
-/* ─────────────────────────────
-   OPEN MODAL — model CTA path
-   Pre-selects the jet ski; 3-step flow (Date → Heure → Infos).
-───────────────────────────── */
+// ── OPEN MODAL — model CTA path
 function openModal(idx) {
   bookingFromAvail = false;
   selectedJetSki   = MODELS[idx].dbName;
@@ -417,11 +383,7 @@ function openModal(idx) {
   buildCal('calGrid', calY, calM, true, null);
 }
 
-/* ─────────────────────────────
-   OPEN MODAL — avail calendar path
-   Date is already known; 4-step flow (Date → Modèle → Heure → Infos).
-   Opens directly at step_model — step1 (calendar) is skipped.
-───────────────────────────── */
+// ── OPEN MODAL — avail calendar path
 function openModalFromAvail(dateStr) {
   bookingFromAvail = true;
   selectedJetSki   = null;
@@ -458,9 +420,7 @@ function closeModal() {
   bookingFromAvail = false;
 }
 
-/* ─────────────────────────────
-   MODAL — EVENT LISTENERS
-───────────────────────────── */
+// ── MODAL — EVENT LISTENERS
 $('modalClose').addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
@@ -497,9 +457,7 @@ $('toStep3').addEventListener('click', () => {
   goStep('step3');
 });
 
-/* ─────────────────────────────
-   MODEL SELECTOR (step_model — avail path only)
-───────────────────────────── */
+// ── MODEL SELECTOR (step_model — avail path only)
 document.querySelectorAll('.mslot').forEach(btn => {
   btn.addEventListener('click', () => {
     const idx = +btn.dataset.modelIdx;
@@ -522,9 +480,7 @@ $('toStep3FromModel').addEventListener('click', () => {
   updateDurPrice();
 });
 
-/* ─────────────────────────────
-   BACK BUTTONS
-───────────────────────────── */
+// ── BACK BUTTONS
 // Step 2 → Step 1 (CTA) or Step_model (avail)
 $('back1').addEventListener('click', () => {
   if (bookingFromAvail) {
@@ -546,9 +502,7 @@ $('back_model').addEventListener('click', () => {
   closeModal();
 });
 
-/* ─────────────────────────────
-   RECAP
-───────────────────────────── */
+// ── RECAP
 function buildRecap() {
   const d   = new Date(selectedDate + 'T12:00:00');
   const ds  = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -559,9 +513,7 @@ function buildRecap() {
     `<strong>${modelLabel}</strong><br>${ds} à ${selectedTime} · ${dur}`;
 }
 
-/* ─────────────────────────────
-   FORM SUBMISSION
-───────────────────────────── */
+// ── FORM SUBMISSION
 $('submitBtn').addEventListener('click', async function () {
   const rawName = $('fName').value.trim();
   const email   = $('fEmail').value.trim();
@@ -643,10 +595,7 @@ $('doneBtn').addEventListener('click', () => {
   document.querySelector('.submit-err')?.remove();
 });
 
-/* ─────────────────────────────
-   AVAILABILITY CALENDAR (section)
-   Interactive: clicking an available day opens the booking modal.
-───────────────────────────── */
+// ── AVAILABILITY CALENDAR (section)
 function updateAvailTitle() {
   const el = $('availTitle');
   if (el) el.textContent = `${MONTHS_FR[availM]} ${availY}`;
@@ -667,9 +616,7 @@ $('availNext').addEventListener('click', () => {
   renderAvail();
 });
 
-/* ─────────────────────────────
-   BURGER / MOBILE MENU
-───────────────────────────── */
+// ── BURGER / MOBILE MENU
 const burger  = $('burger');
 const mobMenu = $('mobMenu');
 let menuOpen  = false;
@@ -692,9 +639,7 @@ mobMenu.querySelectorAll('a').forEach(a => {
   });
 });
 
-/* ─────────────────────────────
-   SMOOTH SCROLL
-───────────────────────────── */
+// ── SMOOTH SCROLL
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const tgt = document.querySelector(a.getAttribute('href'));
@@ -705,9 +650,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-/* ─────────────────────────────
-   INIT
-───────────────────────────── */
+// ── INIT
 mobMenu.style.display = 'none';
 
 async function init() {
@@ -725,13 +668,7 @@ async function init() {
 
 init();
 
-/* ─────────────────────────────
-   STAGGER RAF — timestamp-based, 160Hz-safe
-   Reveals elements[0..n] one-by-one, spaced msPerStep ms apart,
-   calling onReveal(el, idx) for each. Uses a single rAF loop
-   rather than nested setTimeouts so it stays in sync with the
-   display refresh rate.
-───────────────────────────── */
+// ── STAGGER RAF — timestamp-based, 160Hz-safe
 function staggerRAF(elements, msPerStep, onReveal) {
   if (!elements.length) return;
   const start = performance.now();
@@ -752,9 +689,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
   requestAnimationFrame(step);
 }
 
-/* ─────────────────────────────
-   SCROLL REVEAL — Intersection Observer
-───────────────────────────── */
+// ── SCROLL REVEAL — Intersection Observer
 (function () {
   // Nav glass on scroll
   const nav = document.getElementById('nav');
@@ -840,9 +775,7 @@ function staggerRAF(elements, msPerStep, onReveal) {
   }
 })();
 
-/* ─────────────────────────────
-   HERO TEXT — entrance sequence
-───────────────────────────── */
+// ── HERO TEXT — entrance sequence
 setTimeout(() => {
   staggerRAF(
     Array.from(document.querySelectorAll('.intro-hero-el')),
@@ -851,9 +784,7 @@ setTimeout(() => {
   );
 }, 100);
 
-/* ─────────────────────────────
-   MÉTÉO — Open-Meteo live data
-───────────────────────────── */
+// ── MÉTÉO — Open-Meteo live data
 (function () {
   const BASE =
     'https://api.open-meteo.com/v1/forecast' +
@@ -1107,11 +1038,7 @@ setTimeout(() => {
   fetchWeather();
 }());
 
-/* ─────────────────────────────
-   CAROUSEL — Expérience & Sécurité
-   Infinite loop (ghost clones) · auto-advance · arrows ·
-   dots · keyboard · swipe · speed ramp
-───────────────────────────── */
+// ── CAROUSEL — Expérience & Sécurité
 (function () {
   const viewport = document.getElementById('carouselViewport');
   const track    = document.getElementById('carouselTrack');
@@ -1269,10 +1196,7 @@ setTimeout(() => {
   }, { passive: true });
 }());
 
-/* ─────────────────────────────
-   PRICING HEADING — rotating phrase animation
-   Static line is device-aware; the animated span cycles 5 phrases.
-───────────────────────────── */
+// ── PRICING HEADING — rotating phrase animation
 (function () {
   const heading = document.getElementById('pricingHeading');
   const eyebrow = document.getElementById('pricingEyebrow');

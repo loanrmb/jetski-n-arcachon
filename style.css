@@ -761,7 +761,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   /* Avail */
   .avail-layout { grid-template-columns: 1fr; gap: 36px; }
   .avail-text .sec-sub { max-width: 100%; }
-  .reveal--right { transform: translate3d(0, 32px, 0); }
 }
 
 @media (max-width: 600px) {
@@ -780,8 +779,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
     margin-top: 40px;
   }
   .carousel-divider { width: 100%; height: 1px; align-self: auto; }
-  .carousel-arrow--prev { left: 8px; }
-  .carousel-arrow--next { right: 8px; }
   /* Bento — 1 colonne */
   .bento-grid {
     grid-template-columns: 1fr;
@@ -814,6 +811,14 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .avail-card { padding: 20px 16px; }
   .avail { padding: 72px 0; }
   .loc-hour-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+  /* Weather */
+  .weather-section { padding: 60px 0; }
+  .weather-inner { gap: 16px; }
+  .weather-badge { margin-left: 0; width: 100%; justify-content: center; }
+  .wf-row { padding: 11px 14px; gap: 8px; }
+  .wf-day { font-size: 0.8rem; width: 44px; }
+  .weather-cta { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+  .weather-cta .btn { width: 100%; text-align: center; }
 }
 
 @media (max-width: 400px) {
@@ -1323,16 +1328,6 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   flex: 1;
 }
 
-@media (max-width: 600px) {
-  .weather-section { padding: 60px 0; }
-  .weather-inner { gap: 16px; }
-  .weather-badge { margin-left: 0; width: 100%; justify-content: center; }
-  .wf-row { padding: 11px 14px; gap: 8px; }
-  .wf-day { font-size: 0.8rem; width: 44px; }
-  .weather-cta { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
-  .weather-cta .btn { width: 100%; text-align: center; }
-}
-
 /* ════════════════════════════════
    MOBILE RESPONSIVE — ≤768px
    Supplements existing breakpoints.
@@ -1397,7 +1392,7 @@ h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
   .pt-row:not(.pt-head) .pt-c:not(.pt-c--name) { font-weight: 600; }
 
   /* ── Availability calendar: stack vertically, no overflow ── */
-  .avail-layout { grid-template-columns: 1fr; gap: 24px; }
+  .avail-layout { gap: 24px; }
   .avail-card { width: 100%; max-width: 100%; overflow: hidden; }
 
   /* ── Carousel: hide arrows — swipe/touch handles nav ── */
