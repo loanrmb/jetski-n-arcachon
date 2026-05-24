@@ -1,6 +1,4 @@
-/* ═══════════════════════════════════════════════════════
-   Jetski Arcachon — script.js
-   ═══════════════════════════════════════════════════════ */
+// ── Jetski Arcachon — script.js
 
 'use strict';
 
@@ -614,7 +612,6 @@ $('submitBtn').addEventListener('click', async function () {
     goStep('step4');
 
   } catch (err) {
-    console.error('[booking]', err);
     this.disabled    = false;
     this.textContent = 'Envoyer ma demande';
     const errEl = document.createElement('p');
@@ -701,7 +698,6 @@ async function init() {
   } catch (e) {
     // If Supabase is unreachable, render calendars with no blocks
     // rather than crashing the page. Realtime will recover when possible.
-    console.warn('[init] Supabase unavailable, calendars will show no blocks', e);
   }
   renderAvail();
   setupRealtime();
