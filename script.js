@@ -834,13 +834,6 @@ function staggerRAF(elements, msPerStep, onReveal) {
           const delay   = incDone ? 0 : 400;
           setTimeout(() => staggerRAF(ptFlipCells, 80, el => {
             el.classList.add('visible');
-            el.style.willChange = 'auto';
-            revealed++;
-            if (revealed === total) {
-              // All done — remove perspective from table too
-              const pt = document.querySelector('.price-table');
-              if (pt) pt.style.perspective = 'none';
-            }
           }), delay);
           ptFlipObs.disconnect();
         }
